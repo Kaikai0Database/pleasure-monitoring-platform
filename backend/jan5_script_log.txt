@@ -1,0 +1,114 @@
+
+============================================================
+Processing: Test Manual (test_manual@gmail.com)
+Deleting 3 existing Jan 5 assessments...
+Moving Averages for Jan 5:
+  7-day:  40.38888888888889
+  14-day: 39.33333333333333
+  30-day: 39.206896551724135
+
+Target daily average: 39.8
+  (Between 39.2 and 40.4)
+
+Creating 3 assessments with scores: [40, 39.7, 39.8]
+Actual daily average: 39.8
+  [1] 06:00: Score 40.0
+  [2] 14:00: Score 39.7
+  [3] 21:00: Score 39.8
+✓ Assessments created
+
+Running alert check...
+⚠ Created 1 alert(s) - this shouldn't happen!
+  - Type: high, Lines: {"14日": 39.3, "30日": 39.2}
+
+============================================================
+Processing: 123 (angel921030chen@gmail.com)
+Deleting 3 existing Jan 5 assessments...
+Moving Averages for Jan 5:
+  7-day:  37.88888888888889
+  14-day: 34.38461538461539
+  30-day: 35.43678160919541
+
+Target daily average: 35.3
+  (Between 34.4 and 37.9)
+
+Creating 3 assessments with scores: [34.4, 34.5, 37.1]
+Actual daily average: 35.3
+  [1] 06:00: Score 34.4
+  [2] 14:00: Score 34.5
+  [3] 21:00: Score 37.1
+✓ Assessments created
+
+Running alert check...
+✓ No alerts created (as expected - score in middle range)
+
+============================================================
+Processing: xian (111025015@live.asia.edu.tw)
+Deleting 3 existing Jan 5 assessments...
+Moving Averages for Jan 5:
+  7-day:  39.61111111111111
+  14-day: 38.717948717948715
+  30-day: 35.98850574712644
+
+Target daily average: 37.4
+  (Between 36.0 and 39.6)
+
+Creating 3 assessments with scores: [38.9, 36.4, 36.8]
+Actual daily average: 37.4
+  [1] 06:00: Score 38.9
+  [2] 14:00: Score 36.4
+  [3] 21:00: Score 36.8
+✓ Assessments created
+
+Running alert check...
+✓ No alerts created (as expected - score in middle range)
+
+============================================================
+Processing: Test Update (test_update@example.com)
+Deleting 3 existing Jan 5 assessments...
+Moving Averages for Jan 5:
+  7-day:  42.666666666666664
+  14-day: 38.820512820512825
+  30-day: 38.310344827586206
+
+Target daily average: 39.5
+  (Between 38.3 and 42.7)
+
+Creating 3 assessments with scores: [39.0, 40, 39.4]
+Actual daily average: 39.5
+  [1] 06:00: Score 39.0
+  [2] 14:00: Score 40.0
+  [3] 21:00: Score 39.4
+✓ Assessments created
+
+Running alert check...
+✓ No alerts created (as expected - score in middle range)
+
+============================================================
+Processing: 唐洋雞 (111025048@live.asia.edu.tw)
+Deleting 3 existing Jan 5 assessments...
+Moving Averages for Jan 5:
+  7-day:  41.5
+  14-day: 37.15384615384615
+  30-day: 38.367816091954026
+
+Target daily average: 40.2
+  (Between 37.2 and 41.5)
+
+Creating 3 assessments with scores: [41.7, 37.7, 41.1]
+Actual daily average: 40.2
+  [1] 06:00: Score 41.7
+  [2] 14:00: Score 37.7
+  [3] 21:00: Score 41.1
+✓ Assessments created
+
+Running alert check...
+✓ No alerts created (as expected - score in middle range)
+
+============================================================
+All users processed successfully!
+
+Next steps:
+1. Refresh the admin dashboard
+2. All alert bells should disappear for these 5 users
+3. Check charts to verify scores are between MA lines

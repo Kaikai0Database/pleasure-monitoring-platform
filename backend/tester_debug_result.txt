@@ -1,0 +1,27 @@
+=== Tester Account Debug (ID: 4) ===
+
+1. Jan 5 assessments: 3
+   - 2026-01-05 06:00:00: 35/40
+   - 2026-01-05 14:00:00: 35/40
+   - 2026-01-05 21:00:00: 34/40
+
+2. Calculated values:
+   Daily Average: 34.67 (count=3)
+   7-day MA:  41.52
+   14-day MA: 38.52
+   30-day MA: 38.19
+
+3. Expected alert conditions:
+   HIGH alerts: NONE expected
+   LOW alerts: NONE expected
+
+4. Actual alerts in database: 0
+
+5. Historical data check:
+   Historical days before Jan 5: 65
+   Latest 5 dates:
+     - 2026-01-04: 56/56, 56/56, 56/56
+     - 2026-01-03: 36/56, 33/56, 50/56
+     - 2026-01-02: 47/56, 44/56, 31/56
+     - 2026-01-01: 47/56, 48/56, 48/56
+     - 2025-12-31: 27/56, 43/56, 47/56

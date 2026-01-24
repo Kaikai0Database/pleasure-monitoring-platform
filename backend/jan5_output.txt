@@ -1,0 +1,49 @@
+﻿
+============================================================
+Processing: Test Manual (test_manual@gmail.com)
+Deleting 3 existing Jan 5 assessments...
+Moving Averages for Jan 5:
+  7-day:  40.38888888888889
+  14-day: 39.33333333333333
+  30-day: 39.206896551724135
+
+Target daily average: 40.0
+  (Between 39.2 and 40.4)
+
+Creating 3 assessments with scores: [40, 37.6, 40]
+Actual daily average: 39.2
+  [1] 06:00: Score 40.0
+  [2] 14:00: Score 37.6
+  [3] 21:00: Score 40.0
+python : Traceback (most recent cal
+l last):
+位於 線路:1 字元:1
++ python create_jan5_middle_scores.
+py 2>&1 | Out-File -FilePath jan5_o
+u ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo          : NotS 
+   pecified: (Traceback (most rec  
+  ent call last)::String) [], Re   
+ moteException
+    + FullyQualifiedErrorId : Nati 
+   veCommandError
+ 
+  File "C:\Users\user\Desktop\pleas
+ure-monitoring-platform_NEW\backend
+\create_jan5_middle_scores.py", lin
+e 160, in <module>
+    create_middle_score_tests()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\user\Desktop\pleas
+ure-monitoring-platform_NEW\backend
+\create_jan5_middle_scores.py", lin
+e 139, in create_middle_score_tests
+    print("\u2713 Assessments creat
+ed")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'cp950' codec c
+an't encode character '\u2713' in p
+osition 0: illegal multibyte sequen
+ce

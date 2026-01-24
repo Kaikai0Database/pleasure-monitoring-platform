@@ -1,0 +1,73 @@
+================================================================================
+1. Check target users January 5 alerts
+================================================================================
+
+User: Test Manual (test_manual@gmail.com)
+  Assessments on Jan 5: 3
+  Scores: 39/40, 39/40, 40/40
+  Daily Average: 39.33
+  Alerts: HIGH=1, LOW=1
+    [HIGH] Cross over: 14日, 30日
+    [LOW] Approaching: 7日
+
+User: 123 (angel921030chen@gmail.com)
+  Assessments on Jan 5: 3
+  Scores: 35/56, 35/56, 36/56
+  Daily Average: 35.33
+  Alerts: HIGH=1, LOW=1
+    [HIGH] Cross over: 14日
+    [LOW] Approaching: 7日, 30日
+
+User: xian (111025015@live.asia.edu.tw)
+  Assessments on Jan 5: 3
+  Scores: 37/56, 37/56, 38/56
+  Daily Average: 37.33
+  Alerts: HIGH=1, LOW=1
+    [HIGH] Cross over: 30日
+    [LOW] Approaching: 7日, 14日
+
+User: Test Update (test_update@example.com)
+  Assessments on Jan 5: 3
+  Scores: 40/40, 40/40, 39/40
+  Daily Average: 39.67
+  Alerts: HIGH=1, LOW=1
+    [HIGH] Cross over: 14日, 30日
+    [LOW] Approaching: 7日
+
+User: 唐洋雞 (111025048@live.asia.edu.tw)
+  Assessments on Jan 5: 3
+  Scores: 39/56, 40/56, 39/56
+  Daily Average: 39.33
+  Alerts: HIGH=1, LOW=1
+    [HIGH] Cross over: 14日, 30日
+    [LOW] Approaching: 7日
+
+================================================================================
+2. Check if other users have Jan 5 data
+================================================================================
+
+OK: No other users have Jan 5 data
+
+================================================================================
+3. All unread alerts for target users
+================================================================================
+
+Test Manual: 2 unread alerts
+  - 2026-01-05 [high] Cross: 14日, 30日
+  - 2026-01-05 [low] Approach: 7日
+
+123: 2 unread alerts
+  - 2026-01-05 [high] Cross: 14日
+  - 2026-01-05 [low] Approach: 7日, 30日
+
+xian: 2 unread alerts
+  - 2026-01-05 [high] Cross: 30日
+  - 2026-01-05 [low] Approach: 7日, 14日
+
+Test Update: 2 unread alerts
+  - 2026-01-05 [high] Cross: 14日, 30日
+  - 2026-01-05 [low] Approach: 7日
+
+唐洋雞: 2 unread alerts
+  - 2026-01-05 [high] Cross: 14日, 30日
+  - 2026-01-05 [low] Approach: 7日

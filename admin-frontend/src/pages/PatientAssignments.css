@@ -1,0 +1,228 @@
+.assignments-container {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.assignments-header {
+    margin-bottom: 32px;
+}
+
+.assignments-header h1 {
+    font-size: 34px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 8px;
+}
+
+.assignments-header p {
+    color: #718096;
+    font-size: 20px;
+}
+
+.loading {
+    text-align: center;
+    padding: 48px;
+    color: #718096;
+    font-size: 22px;
+}
+
+.assignments-table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 32px;
+}
+
+.assignments-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.assignments-table thead {
+    background: #f7fafc;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.assignments-table th {
+    padding: 16px;
+    text-align: left;
+    font-size: 20px;
+    font-weight: 600;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.assignments-table td {
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 20px;
+    color: #2d3748;
+}
+
+.assignments-table tbody tr:hover {
+    background: #f7fafc;
+}
+
+.email-cell {
+    color: #718096;
+    font-size: 19px;
+}
+
+.assigned-staff-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.assigned-staff-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #edf2f7;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 19px;
+}
+
+.assigned-staff-item span {
+    flex: 1;
+    color: #2d3748;
+}
+
+.unassign-btn {
+    background: #fc8181;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.unassign-btn:hover {
+    background: #f56565;
+}
+
+.no-assignment {
+    color: #a0aec0;
+    font-style: italic;
+    font-size: 19px;
+}
+
+.assign-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.staff-select {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    font-size: 20px;
+    color: #2d3748;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.staff-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.assign-btn {
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.assign-btn:hover {
+    background: #5a67d8;
+}
+
+.assign-btn:active {
+    background: #4c51bf;
+}
+
+.no-data {
+    padding: 48px;
+    text-align: center;
+    color: #a0aec0;
+    font-size: 20px;
+}
+
+.staff-summary {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+}
+
+.staff-summary h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 16px;
+}
+
+.staff-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.staff-card {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.staff-card.clickable {
+    cursor: pointer;
+}
+
+.staff-card.clickable:hover {
+    background: #edf2f7;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+}
+
+.staff-name {
+    font-size: 22px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 4px;
+}
+
+.staff-email {
+    font-size: 19px;
+    color: #718096;
+    margin-bottom: 12px;
+}
+
+.staff-assignments {
+    font-size: 20px;
+    color: #667eea;
+    font-weight: 500;
+}
