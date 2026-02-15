@@ -13,6 +13,7 @@ export interface User {
     created_at?: string;
     daily_login_count?: number;
     is_profile_completed?: boolean;
+    has_consented?: boolean;
     // Profile Fields
     nickname?: string;
     dob?: string;

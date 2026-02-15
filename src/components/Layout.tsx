@@ -14,18 +14,22 @@ export const Layout: React.FC = () => {
 
         // If user is logged in
         if (user) {
-            // If profile is NOT completed AND we are NOT on the setup page
-            if (user.is_profile_completed === false && location.pathname !== '/profile-setup') {
+            // First check: if not consented AND not on consent page, redirect to consent
+            if (user.has_consented === false && location.pathname !== '/consent') {
+                navigate('/consent');
+            }
+            // Second check: if consented but profile not completed AND not on profile-setup page
+            else if (user.has_consented === true && user.is_profile_completed === false && location.pathname !== '/profile-setup') {
                 navigate('/profile-setup');
             }
         }
     }, [user, isLoading, location.pathname, navigate]);
 
     return (
-        <div className="min-h-screen bg-gray-100 font-pixel text-gray-900 flex flex-col">
-            <header className="bg-white border-b-4 border-gray-800 p-4">
+        <div className="min-h-screen font-pixel text-gray-900 flex flex-col">
+            <header className="p-4">
                 <div className="container mx-auto flex justify-center items-center">
-                    <h1 className="text-4xl font-bold">失樂感監測平台</h1>
+                    <h1 className="text-4xl font-bold" style={{ color: '#000000', textShadow: '1px 1px 0px #ffffff' }}>失樂感監測平台</h1>
                 </div>
             </header>
             <main className="container mx-auto p-4 flex-grow">

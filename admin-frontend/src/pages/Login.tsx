@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import './Login.css';
 
@@ -68,6 +69,15 @@ export default function Login() {
                         {loading ? '登入中...' : '登入'}
                     </button>
                 </form>
+
+                <div className="register-link-container">
+                    <p className="register-link-text">
+                        還沒有帳號？
+                        <Link to="/register" className="register-link">
+                            立即註冊
+                        </Link>
+                    </p>
+                </div>
 
                 <div className="login-footer">
                     <p>請使用醫護人員帳號登入</p>

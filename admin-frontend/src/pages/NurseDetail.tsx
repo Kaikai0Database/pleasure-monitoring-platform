@@ -123,9 +123,9 @@ export default function NurseDetail() {
                     ← 返回
                 </button>
                 <div className="nurse-info">
-                    <h1>{nurse.name} 的病人列表</h1>
+                    <h1>{nurse.name} 的個案列表</h1>
                     <p className="nurse-email">{nurse.email}</p>
-                    <p className="patient-count">已分配 {assignedPatients.length} 位病人</p>
+                    <p className="patient-count">已分配 {assignedPatients.length} 位個案</p>
                 </div>
             </div>
 
@@ -133,7 +133,7 @@ export default function NurseDetail() {
                 <table className="patients-table">
                     <thead>
                         <tr>
-                            <th>病人姓名</th>
+                            <th>個案姓名</th>
                             <th>郵箱</th>
                             <th>已分配護理師</th>
                             <th>分配護理師</th>
@@ -203,7 +203,7 @@ export default function NurseDetail() {
                 </table>
 
                 {assignedPatients.length === 0 && (
-                    <div className="no-data">此護理師目前沒有分配的病人</div>
+                    <div className="no-data">此護理師目前沒有分配的個案</div>
                 )}
             </div>
         </div>

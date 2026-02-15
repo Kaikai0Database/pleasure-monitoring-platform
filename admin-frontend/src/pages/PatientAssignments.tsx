@@ -48,20 +48,33 @@ export default function PatientAssignments() {
 
             if (patientsRes.data.success) {
                 setPatients(patientsRes.data.patients);
+            } else {
+                console.error('[PatientAssignments] Patients response error:', patientsRes.data);
             }
 
             if (staffRes.data.success) {
-                // Filter out super admins, only show nurses
-                const nurses = staffRes.data.staff.filter((s: Staff) => s.role === 'nurse');
-                setStaffList(nurses);
+                // 顯示所有 clinical 角色的醫護人員（醫師、護理師、心理師等）
+                const clinicalStaff = staffRes.data.staff.filter((s: Staff) => s.role === 'clinical');
+                setStaffList(clinicalStaff);
+            } else {
+                console.error('[PatientAssignments] Staff list error:', staffRes.data);
+                // Show specific error message
+                if (staffRes.data.message) {
+                    alert(staffRes.data.message);
+                }
             }
 
             if (assignmentsRes.data.success) {
                 setAssignments(assignmentsRes.data.assignments);
+            } else {
+                console.error('[PatientAssignments] Assignments response error:', assignmentsRes.data);
             }
         } catch (err: any) {
-            console.error('Failed to fetch data:', err);
-            alert(err.response?.data?.message || '載入失敗');
+            console.error('[PatientAssignments] Fetch error:', err);
+            console.error('[PatientAssignments] Error response:', err.response);
+
+            const errorMessage = err.response?.data?.message || '載入失敗';
+            alert(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -69,7 +82,7 @@ export default function PatientAssignments() {
 
     const handleAssign = async (patientId: number, staffId: number) => {
         if (!staffId) {
-            alert('請選擇護理師');
+            alert('請選擇醫護人員');
             return;
         }
 
@@ -112,18 +125,18 @@ export default function PatientAssignments() {
     return (
         <div className="assignments-container">
             <div className="assignments-header">
-                <h1>病人分配管理</h1>
-                <p>將病人分配給護理師，護理師只能查看分配給自己的病人</p>
+                <h1>個案分配管理</h1>
+                <p>將個案分配給醫護人員，醫護人員只能查看分配給自己的個案</p>
             </div>
 
             <div className="assignments-table-container">
                 <table className="assignments-table">
                     <thead>
                         <tr>
-                            <th>病人姓名</th>
+                            <th>個案姓名</th>
                             <th>郵箱</th>
-                            <th>已分配護理師</th>
-                            <th>分配新護理師</th>
+                            <th>已分配醫護人員</th>
+                            <th>分配新醫護人員</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -161,7 +174,7 @@ export default function PatientAssignments() {
                                                 className="staff-select"
                                                 defaultValue=""
                                             >
-                                                <option value="">選擇護理師...</option>
+                                                <option value="">選擇醫護人員...</option>
                                                 {staffList.map((staff) => (
                                                     <option key={staff.id} value={staff.id}>
                                                         {staff.name} ({staff.email})
@@ -191,12 +204,12 @@ export default function PatientAssignments() {
                 </table>
 
                 {patients.length === 0 && (
-                    <div className="no-data">目前沒有病人資料</div>
+                    <div className="no-data">目前沒有個案資料</div>
                 )}
             </div>
 
             <div className="staff-summary">
-                <h3>護理師列表</h3>
+                <h3>醫護人員列表</h3>
                 <div className="staff-list">
                     {staffList.map((staff) => {
                         const assignedCount = assignments.filter(
@@ -211,7 +224,7 @@ export default function PatientAssignments() {
                                 <div className="staff-name">{staff.name}</div>
                                 <div className="staff-email">{staff.email}</div>
                                 <div className="staff-assignments">
-                                    已分配病人: {assignedCount} 位
+                                    已分配個案: {assignedCount} 位
                                 </div>
                             </div>
                         );

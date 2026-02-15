@@ -106,3 +106,26 @@
   color: #718096;
 }
 
+/* 註冊連結樣式 */
+.register-link-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.register-link-text {
+  font-size: 24px;
+  color: #4a5568;
+}
+
+.register-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 8px;
+  transition: all 0.2s ease;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+  color: #764ba2;
+}

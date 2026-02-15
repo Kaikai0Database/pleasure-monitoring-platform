@@ -1,6 +1,7 @@
 import type { Diary, DiaryFormData } from '../types/diary';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// Use environment variable or fallback to /api for proxy
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // 獲取 token
 function getAuthToken(): string | null {
@@ -12,6 +13,7 @@ function getAuthHeaders(): HeadersInit {
     const token = getAuthToken();
     return {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true', // Bypass ngrok warning
         ...(token && { 'Authorization': `Bearer ${token}` }),
     };
 }
@@ -130,6 +132,7 @@ export const diaryService = {
         const response = await fetch(`${API_BASE_URL}/diary/upload-image`, {
             method: 'POST',
             headers: {
+                'ngrok-skip-browser-warning': 'true',
                 ...(token && { 'Authorization': `Bearer ${token}` }),
             },
             body: formData,

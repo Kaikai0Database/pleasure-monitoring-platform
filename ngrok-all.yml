@@ -1,0 +1,22 @@
+version: "2"
+authtoken: 39GCLpFz8FoRrvBCPZTEQISe6RK_4H23gwU8gV9myQaA1E2d1
+
+tunnels:
+  backend:
+    proto: http
+    addr: 5000
+    schemes:
+      - https
+      - http
+  admin:
+    proto: http
+    addr: 5174
+    schemes:
+      - https
+      - http
+  frontend:
+    proto: http
+    addr: 5173
+    schemes:
+      - https
+      - http

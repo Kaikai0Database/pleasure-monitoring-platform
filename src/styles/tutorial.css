@@ -1,0 +1,66 @@
+/* Tutorial 專用 CSS 動畫 */
+
+/* 脈衝邊框動畫（增強發光效果）*/
+@keyframes pulse-border {
+
+    0%,
+    100% {
+        box-shadow: 0 0 30px rgba(255, 255, 255, 1),
+            0 0 60px rgba(255, 255, 255, 0.8),
+            inset 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 50px rgba(255, 255, 255, 1),
+            0 0 80px rgba(255, 255, 255, 1),
+            inset 0 0 30px rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* 彈跳動畫（用於小飛船） */
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.animate-bounce {
+    animation: bounce 2s ease-in-out infinite;
+}
+
+/* Tutorial 按鈕樣式 */
+.tutorial-help-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border: 4px solid #000;
+    border-radius: 50%;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.tutorial-help-button:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
+    transform: translate(2px, 2px);
+}
+
+.tutorial-help-button:active {
+    box-shadow: none;
+    transform: translate(4px, 4px);
+}

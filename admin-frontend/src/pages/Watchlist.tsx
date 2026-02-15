@@ -65,31 +65,29 @@ function SortablePatientRow({
                                 ⚠️
                             </span>
                         )}
+                        {alertCount.high.count > 0 && (
+                            <span
+                                className="alert-bell-icon"
+                                title={`穿越${alertCount.high.lines.join('線、')}線`}
+                            >
+                                🔔
+                            </span>
+                        )}
+                        {alertCount.low.count > 0 && (
+                            <span
+                                className="alert-low-icon"
+                                title={`接近${alertCount.low.lines.join('線、')}線`}
+                            >
+                                📉
+                            </span>
+                        )}
                         {showGroupBadge && item.patient?.group && (
-                            <>
-                                <span
-                                    className={`group-badge ${item.patient.group}`}
-                                    title={item.patient.group === 'student' ? '大學生組（門檻≥24分）' : '臨床組（門檻≥29分）'}
-                                >
-                                    {item.patient.group === 'student' ? '🎓 大學生組' : '🏥 臨床組'}
-                                </span>
-                                {alertCount.high.count > 0 && (
-                                    <span
-                                        className="alert-bell-icon"
-                                        title={`穿越${alertCount.high.lines.join('線、')}線`}
-                                    >
-                                        🔔
-                                    </span>
-                                )}
-                                {alertCount.low.count > 0 && (
-                                    <span
-                                        className="alert-low-icon"
-                                        title={`接近${alertCount.low.lines.join('線、')}線`}
-                                    >
-                                        📉
-                                    </span>
-                                )}
-                            </>
+                            <span
+                                className={`group-badge ${item.patient.group}`}
+                                title={item.patient.group === 'student' ? '大學生組（門檻≥24分）' : '臨床組（門檻≥30分）'}
+                            >
+                                {item.patient.group === 'student' ? '🎓 大學生組' : '🏥 臨床組'}
+                            </span>
                         )}
                     </div>
                     <div className="patient-email-text">{item.patient?.email}</div>
@@ -210,11 +208,11 @@ export default function Watchlist() {
     };
 
     const handleRemove = async (patientId: number, e: React.MouseEvent) => {
-        e.stopPropagation(); // 防止觸發病人卡片點擊
+        e.stopPropagation(); // 防止觸發個案卡片點擊
 
         console.log('Attempting to remove patient:', patientId);
 
-        if (!confirm('確定要從特別關注中移除此病人嗎？')) {
+        if (!confirm('確定要從特別關注中移除此個案嗎？')) {
             console.log('User cancelled removal');
             return;
         }
@@ -250,7 +248,7 @@ export default function Watchlist() {
         switch (groupFilter) {
             case 'student': return '大學生組';
             case 'clinical': return '臨床組';
-            default: return '特別關注病人';
+            default: return '特別關注個案';
         }
     };
 
@@ -277,7 +275,7 @@ export default function Watchlist() {
     return (
         <div className="watchlist-container">
             <div className="page-header">
-                <h2 className="page-title">特別關注病人總覽</h2>
+                <h2 className="page-title">特別關注個案總覽</h2>
                 <div className="header-controls">
                     <select
                         className="group-filter-select"
@@ -290,7 +288,7 @@ export default function Watchlist() {
                     </select>
                 </div>
             </div>
-            <div className="watchlist-count">共 {filteredWatchlist.length} 位病人</div>
+            <div className="watchlist-count">共 {filteredWatchlist.length} 位個案</div>
 
             {
                 filteredWatchlist.length === 0 ? (
@@ -298,8 +296,8 @@ export default function Watchlist() {
                         <div className="empty-icon">⭐</div>
                         <p className="empty-text">
                             {groupFilter === 'all'
-                                ? '尚未添加任何特別關注病人'
-                                : `目前${groupFilter === 'student' ? '大學生組' : '臨床組'}沒有特別關注病人`}
+                                ? '尚未添加任何特別關注個案'
+                                : `目前${groupFilter === 'student' ? '大學生組' : '臨床組'}沒有特別關注個案`}
                         </p>
                         <p className="empty-hint">您可以在總覽頁面添加特別關注</p>
                     </div>

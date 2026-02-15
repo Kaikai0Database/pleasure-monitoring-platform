@@ -28,7 +28,7 @@ export const Signup: React.FC = () => {
 
         try {
             await signup(email, name, password);
-            navigate('/profile-setup');
+            navigate('/consent');
         } catch (err) {
             setError('註冊失敗，此電子郵件可能已被使用');
         } finally {

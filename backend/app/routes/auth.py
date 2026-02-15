@@ -182,3 +182,29 @@ def update_profile():
         print(f"Profile update error: {str(e)}")
         print(f"Traceback: {error_detail}")
         return jsonify({'success': False, 'message': f'更新失敗: {str(e)}', 'error_detail': str(e)}), 500
+
+
+@auth_bp.route('/consent', methods=['POST'])
+@jwt_required()
+def submit_consent():
+    """Record user consent to terms of service"""
+    try:
+        current_user_id = int(get_jwt_identity())
+        user = User.query.get(current_user_id)
+        
+        if not user:
+            return jsonify({'success': False, 'message': '用戶不存在'}), 404
+        
+        # Mark user as consented
+        user.has_consented = True
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '同意條款成功',
+            'user': user.to_dict()
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'記錄同意狀態失敗: {str(e)}'}), 500

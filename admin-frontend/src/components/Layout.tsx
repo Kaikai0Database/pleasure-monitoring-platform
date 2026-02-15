@@ -20,8 +20,8 @@ export default function Layout({ children }: LayoutProps) {
 
     const menuItems = [
         { path: '/dashboard', label: '總覽', icon: '📊' },
-        { path: '/watchlist', label: '特別關注病人', icon: '⭐' },
-        { path: '/assignments', label: '病人分配', icon: '👥' },
+        { path: '/watchlist', label: '特別關注個案', icon: '⭐' },
+        { path: '/assignments', label: '個案分配', icon: '👥' },
     ];
 
     return (

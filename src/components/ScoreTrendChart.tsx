@@ -216,7 +216,7 @@ export const ScoreTrendChart: React.FC<ScoreTrendChartProps> = ({ history }) => 
             <div className="flex flex-col items-center mb-6">
                 <div className="flex items-center gap-4 mb-4 flex-wrap justify-center">
                     <h3 className="text-xl font-bold">
-                        {viewMode === 'all' ? '綜合分數趨勢（當日/7日/14日/30日）' : viewMode === 'daily' ? '每日平均分數' : `近 ${viewMode} 日分數走勢`}
+                        {viewMode === 'all' ? '綜合分數趨勢' : viewMode === 'daily' ? '每日平均分數' : `近 ${viewMode} 日分數走勢`}
                     </h3>
                     {latestHighAlert && (
                         <span className="text-lg font-bold text-red-600">
@@ -266,146 +266,171 @@ export const ScoreTrendChart: React.FC<ScoreTrendChartProps> = ({ history }) => 
             {/* 綜合圖表 - 4條線 */}
             {viewMode === 'all' && multiLineChartData.length > 0 && (
                 <div className="mb-6">
-                    <ResponsiveContainer width="100%" height={400}>
-                        <LineChart data={multiLineChartData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
-                            <YAxis
-                                label={{ value: '分數', angle: -90, position: 'insideLeft' }}
-                                ticks={[12, 24, 45]}
-                                domain={[0, 56]}
-                            />
-                            <Tooltip formatter={(value, name) => [value, String(name).includes('-') ? String(name).split('-')[1] : name]} />
-                            <Legend formatter={(value) => String(value).includes('-') ? String(value).split('-')[1] : value} />
-                            <Line
-                                type="monotone"
-                                dataKey="當日平均"
-                                stroke="#f59e0b"
-                                strokeWidth={2}
-                                name="1-當日平均"
-                                dot={{ r: 3 }}
-                                connectNulls
-                            />
-                            <Line
-                                type="monotone"
-                                dataKey="7日平均"
-                                stroke="#667eea"
-                                strokeWidth={2.5}
-                                name="2-7日平均"
-                                dot={false}
-                                connectNulls
-                            />
-                            <Line
-                                type="monotone"
-                                dataKey="14日平均"
-                                stroke="#48bb78"
-                                strokeWidth={2.5}
-                                name="3-14日平均"
-                                dot={false}
-                                connectNulls
-                            />
-                            <Line
-                                type="monotone"
-                                dataKey="30日平均"
-                                stroke="#9f7aea"
-                                strokeWidth={2.5}
-                                name="4-30日平均"
-                                dot={false}
-                                connectNulls
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+                        <ResponsiveContainer
+                            width={multiLineChartData.length > 30 ? multiLineChartData.length * 30 : '100%'}
+                            height={400}
+                        >
+                            <LineChart data={multiLineChartData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis
+                                    label={{ value: '分數', angle: -90, position: 'insideLeft' }}
+                                    ticks={[12, 24, 45]}
+                                    domain={[0, 56]}
+                                />
+                                <Tooltip formatter={(value, name) => [value, String(name).includes('-') ? String(name).split('-')[1] : name]} />
+                                <Legend formatter={(value) => String(value).includes('-') ? String(value).split('-')[1] : value} />
+                                <Line
+                                    type="monotone"
+                                    dataKey="當日平均"
+                                    stroke="#f59e0b"
+                                    strokeWidth={2}
+                                    name="1-當日平均"
+                                    dot={{ r: 3 }}
+                                    connectNulls
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="7日平均"
+                                    stroke="#667eea"
+                                    strokeWidth={2.5}
+                                    name="2-7日平均"
+                                    dot={false}
+                                    connectNulls
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="14日平均"
+                                    stroke="#48bb78"
+                                    strokeWidth={2.5}
+                                    name="3-14日平均"
+                                    dot={false}
+                                    connectNulls
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="30日平均"
+                                    stroke="#9f7aea"
+                                    strokeWidth={2.5}
+                                    name="4-30日平均"
+                                    dot={false}
+                                    connectNulls
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
             )}
 
             {/* 每日線 - 單獨顯示 */}
             {viewMode === 'daily' && combinedChartData.length > 0 && (
                 <div className="mb-6">
-                    <ResponsiveContainer width="100%" height={400}>
-                        <LineChart data={combinedChartData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
-                            <YAxis
-                                label={{ value: '分數', angle: -90, position: 'insideLeft' }}
-                                ticks={[12, 24, 45]}
-                                domain={[0, 56]}
-                            />
-                            <Tooltip />
-                            <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="當日平均"
-                                stroke="#f59e0b"
-                                strokeWidth={3}
-                                name="當日平均"
-                                dot={{ fill: '#f59e0b', r: 4 }}
-                                connectNulls
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+                        <ResponsiveContainer
+                            width={combinedChartData.length > 30 ? combinedChartData.length * 30 : '100%'}
+                            height={400}
+                        >
+                            <LineChart data={combinedChartData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis
+                                    label={{ value: '分數', angle: -90, position: 'insideLeft' }}
+                                    ticks={[12, 24, 45]}
+                                    domain={[0, 56]}
+                                />
+                                <Tooltip />
+                                <Legend />
+                                <Line
+                                    type="monotone"
+                                    dataKey="當日平均"
+                                    stroke="#f59e0b"
+                                    strokeWidth={3}
+                                    name="當日平均"
+                                    dot={{ fill: '#f59e0b', r: 4 }}
+                                    connectNulls
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
             )}
 
             {/* 7日線 */}
             {viewMode === 7 && chart7Days.length > 0 && (
                 <div>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={chart7Days}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
-                            <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
-                            <Tooltip />
-                            <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="分數"
-                                stroke="#667eea"
-                                strokeWidth={2}
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+                        <ResponsiveContainer
+                            width={chart7Days.length > 30 ? chart7Days.length * 30 : '100%'}
+                            height={300}
+                        >
+                            <LineChart data={chart7Days}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
+                                <Tooltip />
+                                <Legend />
+                                <Line
+                                    type="monotone"
+                                    dataKey="分數"
+                                    stroke="#667eea"
+                                    strokeWidth={2}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
             )}
 
             {/* 14日線 */}
             {viewMode === 14 && chart14Days.length > 0 && (
                 <div>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={chart14Days}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
-                            <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
-                            <Tooltip />
-                            <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="分數"
-                                stroke="#48bb78"
-                                strokeWidth={2}
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+                        <ResponsiveContainer
+                            width={chart14Days.length > 30 ? chart14Days.length * 30 : '100%'}
+                            height={300}
+                        >
+                            <LineChart data={chart14Days}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
+                                <Tooltip />
+                                <Legend />
+                                <Line
+                                    type="monotone"
+                                    dataKey="分數"
+                                    stroke="#48bb78"
+                                    strokeWidth={2}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
             )}
 
             {/* 30日線 */}
             {viewMode === 30 && chart30Days.length > 0 && (
                 <div>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={chart30Days}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
-                            <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
-                            <Tooltip />
-                            <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="分數"
-                                stroke="#9f7aea"
-                                strokeWidth={2}
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+                        <ResponsiveContainer
+                            width={chart30Days.length > 30 ? chart30Days.length * 30 : '100%'}
+                            height={300}
+                        >
+                            <LineChart data={chart30Days}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
+                                <Tooltip />
+                                <Legend />
+                                <Line
+                                    type="monotone"
+                                    dataKey="分數"
+                                    stroke="#9f7aea"
+                                    strokeWidth={2}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
             )}
 

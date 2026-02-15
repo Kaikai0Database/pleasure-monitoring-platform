@@ -1,11 +1,13 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api/admin';
+// Use environment variable or fallback to /api/admin for proxy
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '') + '/api/admin';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': '69420',  // Bypass ngrok warning page
     },
 });
 
@@ -34,8 +36,14 @@ api.interceptors.response.use(
 export const authAPI = {
     login: (email: string, password: string) =>
         api.post('/auth/login', { email, password }),
-    register: (email: string, password: string, name: string, role?: string) =>
-        api.post('/auth/register', { email, password, name, role }),
+    register: (email: string, password: string, name: string, jobTitle: string) =>
+        api.post('/auth/register', {
+            email,
+            password,
+            name,
+            role: 'clinical',  // 固定為 'clinical'
+            job_title: jobTitle  // 職稱（醫師、護理師等）
+        }),
     getMe: () => api.get('/auth/me'),
 };
 

@@ -7,7 +7,8 @@ import type {
     ApiResponse,
 } from '../types/api';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// Use environment variable or fallback to /api for proxy
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Helper function to get auth token
 const getAuthToken = (): string | null => {
@@ -18,6 +19,7 @@ const getAuthToken = (): string | null => {
 const createHeaders = (includeAuth: boolean = false): HeadersInit => {
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true', // Bypass ngrok warning
     };
 
     if (includeAuth) {

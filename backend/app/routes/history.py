@@ -95,8 +95,8 @@ def save_history():
             # Student group: threshold is 23
             level = '需要關注' if total_score >= 23 else '良好'
         else:
-            # Clinical group: threshold is 29
-            level = '需要關注' if total_score >= 29 else '良好'
+            # Clinical group: threshold is 30
+            level = '需要關注' if total_score >= 30 else '良好'
         
         # Create new history record
         new_history = AssessmentHistory(
@@ -112,11 +112,11 @@ def save_history():
         db.session.commit()
         
         # --- Auto-Watchlist Logic ---
-        # Check thresholds: Student >= 23, Clinical >= 29
+        # Check thresholds: Student >= 23, Clinical >= 30
         threshold_met = False
         if user.group == 'student' and total_score >= 23:
             threshold_met = True
-        elif user.group == 'clinical' and total_score >= 29:
+        elif user.group == 'clinical' and total_score >= 30:
             threshold_met = True
             
         if threshold_met:
@@ -259,8 +259,8 @@ def restore_history(history_id):
             # Student group: threshold is 23
             history.level = '需要關注' if history.total_score >= 23 else '良好'
         else:
-            # Clinical group: threshold is 29
-            history.level = '需要關注' if history.total_score >= 29 else '良好'
+            # Clinical group: threshold is 30
+            history.level = '需要關注' if history.total_score >= 30 else '良好'
         
         db.session.commit()
         

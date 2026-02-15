@@ -6,12 +6,18 @@ import { PixelButton } from '../components/ui/PixelButton';
 import { type Answer, calculateScore, getScoreInterpretation } from '../data/questions';
 import { historyApi } from '../services/api';
 import { Footer } from '../components/Footer';
+import { incrementDailyActivity, calculateCompoundXP, addXP, setAssessmentCooldown } from '../utils/gamification';
 
 export const GameResult: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const answers = location.state?.answers as Answer[] | undefined;
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+    const [xpBonusInfo, setXpBonusInfo] = useState<{
+        xp: number;
+        bonusText: string[];
+        totalMultiplier: number;
+    } | null>(null);
 
     const { user } = useAuth(); // Get user to check group
 
@@ -25,11 +31,15 @@ export const GameResult: React.FC = () => {
     // Determine level locally based on user group for immediate display
     let localLevel = '良好';
     if (user?.group === 'student') {
+        // 學生組：分數 >= 24 為需要關注
         localLevel = totalScore >= 24 ? '需要關注' : '良好';
+        console.log(`📊 [學生組] 分數: ${totalScore}, 切截點: 24, 判定: ${localLevel}`);
     } else {
-        // Clinical or default
-        localLevel = totalScore >= 29 ? '需要關注' : '良好';
+        // 臨床組（Clinical）或預設：分數 >= 30 為需要關注
+        localLevel = totalScore >= 30 ? '需要關注' : '良好';
+        console.log(`📊 [臨床組] 分數: ${totalScore}, 切截點: 30, 判定: ${localLevel}`);
     }
+    console.log(`👤 用戶組別: ${user?.group || 'undefined'}, 用戶名稱: ${user?.name}`);
 
     const interpretation = getScoreInterpretation(totalScore, localLevel);
     const percentage = Math.round((totalScore / maxScore) * 100);
@@ -55,6 +65,56 @@ export const GameResult: React.FC = () => {
                     })),
                 });
                 setSaveStatus('saved');
+
+                // ===== 遊戲化邏輯：XP 獎勵與冷卻 =====
+                try {
+                    // 確保有用戶 ID 才執行遊戲化邏輯
+                    if (user?.id) {
+                        // 1. 遞增每日活動次數（用戶專屬）
+                        const activityCount = incrementDailyActivity(user.id);
+
+                        // 2. 獲取連續天數（從user物件，由後端API提供）
+                        const streak = user.consecutive_days || 0;
+
+                        // 3. 計算複方XP獎勵（基礎50 × 當日加成 × 連續加成）
+                        const xpReward = calculateCompoundXP(activityCount, streak);
+
+                        // 存儲XP獎勵信息用於UI顯示
+                        setXpBonusInfo({
+                            xp: xpReward.xp,
+                            bonusText: xpReward.bonusText,
+                            totalMultiplier: xpReward.totalMultiplier
+                        });
+
+                        // 4. 增加 XP 並處理升級（用戶專屬）
+                        const result = addXP(xpReward.xp, user.id);
+
+                        // 5. 設定 5 小時冷卻（用戶專屬）
+                        console.assert(user.id, "CRITICAL: No UserID found during cooldown save!");
+                        setAssessmentCooldown(user.id);
+
+                        // 6. 觸發 PlayerInfo 即時更新
+                        window.dispatchEvent(new Event('gamificationUpdated'));
+
+                        // Console 輸出（開發用）
+                        console.log(`✨ 測驗完成獎勵：+${xpReward.xp} XP (基礎${xpReward.baseXP} × ${xpReward.totalMultiplier})`);
+                        console.log(`   當日第${activityCount}次 (${xpReward.dailyMultiplier}x) × 連續${streak}天 (${xpReward.streakMultiplier}x)`);
+                        console.log(`   當前等級：${result.level} | XP：${result.xp}`);
+
+                        if (xpReward.bonusText.length > 0) {
+                            console.log(`🎊 獲得加成: ${xpReward.bonusText.join(' + ')}`);
+                        }
+
+                        if (result.leveledUp) {
+                            console.log('🎉 恭喜升級！');
+                        }
+                    } else {
+                        console.warn('無法獲取用戶 ID，跳過遊戲化邏輯');
+                    }
+                } catch (gamificationError) {
+                    console.error('Gamification logic error:', gamificationError);
+                    // 不阻斷測驗保存流程，僅記錄錯誤
+                }
             } catch (error) {
                 console.error('Failed to save assessment:', error);
                 setSaveStatus('error');
@@ -151,6 +211,39 @@ export const GameResult: React.FC = () => {
                         ))}
                     </div>
                 </PixelCard>
+
+                {/* XP Bonus Display */}
+                {xpBonusInfo && xpBonusInfo.bonusText.length > 0 && (
+                    <PixelCard className="bg-gradient-to-br from-yellow-100 to-orange-100">
+                        <div className="text-center space-y-3">
+                            <div className="text-xl font-bold text-purple-800">
+                                🎊 獲得經驗值加成！
+                            </div>
+                            <div className="text-3xl font-bold text-orange-600">
+                                +{xpBonusInfo.xp} XP
+                            </div>
+                            <div className="flex flex-wrap gap-2 justify-center">
+                                {xpBonusInfo.bonusText.map((text: string, index: number) => (
+                                    <div
+                                        key={index}
+                                        className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-400 border-4 border-black text-black font-bold text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                                        style={{
+                                            textShadow: '1px 1px 0px rgba(255,255,255,0.5)',
+                                            fontFamily: '"Press Start 2P", monospace'
+                                        }}
+                                    >
+                                        {text}
+                                    </div>
+                                ))}
+                            </div>
+                            {xpBonusInfo.totalMultiplier > 1 && (
+                                <div className="text-sm text-purple-700 font-semibold">
+                                    基礎 50 XP × {xpBonusInfo.totalMultiplier} 倍加成
+                                </div>
+                            )}
+                        </div>
+                    </PixelCard>
+                )}
 
                 {/* Action Buttons */}
                 <div className="flex gap-4 justify-center">

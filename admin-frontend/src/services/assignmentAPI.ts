@@ -1,10 +1,15 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api/admin';
+// Use environment variable or fallback to /api/admin for proxy
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '') + '/api/admin';
 
 // Create axios instance with auth token
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': '69420',  // Bypass ngrok warning page
+    },
 });
 
 // Add auth token to requests

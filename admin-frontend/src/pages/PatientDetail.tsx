@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     LineChart,
@@ -13,6 +13,8 @@ import {
 import { patientsAPI, watchlistAPI, diaryAPI } from '../services/api';
 import { type Patient, type Assessment, type Statistics, type Diary } from '../types';
 import { DailyScoreChart } from '../components/DailyScoreChart';
+import { downloadCSV, downloadChartAsPNG } from '../utils/chartDownloadUtils';
+import { CustomMATooltip } from '../components/CustomMATooltip';
 import './PatientDetail.css';
 
 type ViewTab = 'history' | 'profile' | 'diary';
@@ -30,6 +32,12 @@ export default function PatientDetail() {
     const [latestHighAlert, setLatestHighAlert] = useState<any>(null);
     const [latestLowAlert, setLatestLowAlert] = useState<any>(null);
     const [selectedDiary, setSelectedDiary] = useState<Diary | null>(null);
+
+    // Chart refs for PNG download
+    const multiLineChartRef = useRef<HTMLDivElement>(null);
+    const chart7DaysRef = useRef<HTMLDivElement>(null);
+    const chart14DaysRef = useRef<HTMLDivElement>(null);
+    const chart30DaysRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (id) {
@@ -106,7 +114,7 @@ export default function PatientDetail() {
     }
 
     if (!patient) {
-        return <div className="patient-detail-error">病人不存在</div>;
+        return <div className="patient-detail-error">個案不存在</div>;
     }
 
     // 準備不同時間範圍的移動平均數據
@@ -193,13 +201,13 @@ export default function PatientDetail() {
                     onClick={() => setActiveTab('profile')}
                     className={`tab-button ${activeTab === 'profile' ? 'active' : ''}`}
                 >
-                    病人基本資料
+                    個案基本資料
                 </button>
                 <button
                     onClick={() => setActiveTab('diary')}
                     className={`tab-button ${activeTab === 'diary' ? 'active' : ''}`}
                 >
-                    病人日記
+                    個案日記
                 </button>
             </div>
 
@@ -251,77 +259,118 @@ export default function PatientDetail() {
                         });
 
                         return (
-                            <div className="chart-section">
-                                <h3 className="section-title">
-                                    綜合分數趨勢（當日/7日/14日/30日）
-                                    {latestHighAlert && latestHighAlert.exceeded_lines && (() => {
-                                        const lines = latestHighAlert.exceeded_lines;
-                                        if (typeof lines === 'object' && Object.keys(lines).length > 0) {
-                                            return (
-                                                <span style={{ color: '#dc2626', fontWeight: 'bold', marginLeft: '16px' }}>
-                                                    穿越{Object.keys(lines).join('線、')}線
-                                                </span>
-                                            );
-                                        }
-                                        return null;
-                                    })()}
-                                    {latestLowAlert && latestLowAlert.exceeded_lines && (() => {
-                                        const lines = latestLowAlert.exceeded_lines;
-                                        if (typeof lines === 'object' && Object.keys(lines).length > 0) {
-                                            return (
-                                                <span style={{ color: '#2563eb', fontWeight: 'bold', marginLeft: '16px' }}>
-                                                    接近{Object.keys(lines).join('線、')}線
-                                                </span>
-                                            );
-                                        }
-                                        return null;
-                                    })()}
-                                </h3>
-                                <ResponsiveContainer width="100%" height={400}>
-                                    <LineChart data={multiLineTrendData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="date" />
-                                        <YAxis label={{ value: '分數', angle: -90, position: 'insideLeft' }} ticks={[12, 24, 45]} domain={[0, 56]} />
-                                        <Tooltip formatter={(value, name) => [value, String(name).includes('-') ? String(name).split('-')[1] : name]} />
-                                        <Legend formatter={(value) => String(value).includes('-') ? String(value).split('-')[1] : value} />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="當日分數"
-                                            stroke="#f59e0b"
-                                            strokeWidth={2}
-                                            name="1-當日分數"
-                                            dot={{ r: 3 }}
-                                            connectNulls
-                                        />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="7日平均"
-                                            stroke="#667eea"
-                                            strokeWidth={2.5}
-                                            name="2-7日平均"
-                                            dot={false}
-                                            connectNulls
-                                        />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="14日平均"
-                                            stroke="#48bb78"
-                                            strokeWidth={2.5}
-                                            name="3-14日平均"
-                                            dot={false}
-                                            connectNulls
-                                        />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="30日平均"
-                                            stroke="#9f7aea"
-                                            strokeWidth={2.5}
-                                            name="4-30日平均"
-                                            dot={false}
-                                            connectNulls
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
+                            <div className="chart-section" ref={multiLineChartRef}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                    <h3 className="section-title" style={{ margin: 0 }}>
+                                        綜合分數趨勢
+                                        {latestHighAlert && latestHighAlert.exceeded_lines && (() => {
+                                            const lines = latestHighAlert.exceeded_lines;
+                                            if (typeof lines === 'object' && Object.keys(lines).length > 0) {
+                                                return (
+                                                    <span style={{ color: '#dc2626', fontWeight: 'bold', marginLeft: '16px' }}>
+                                                        穿越{Object.keys(lines).join('線、')}線
+                                                    </span>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
+                                        {latestLowAlert && latestLowAlert.exceeded_lines && (() => {
+                                            const lines = latestLowAlert.exceeded_lines;
+                                            if (typeof lines === 'object' && Object.keys(lines).length > 0) {
+                                                return (
+                                                    <span style={{ color: '#2563eb', fontWeight: 'bold', marginLeft: '16px' }}>
+                                                        接近{Object.keys(lines).join('線、')}線
+                                                    </span>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
+                                    </h3>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button
+                                            onClick={() => downloadCSV(multiLineTrendData, '綜合分數趨勢')}
+                                            style={{
+                                                padding: '6px 12px',
+                                                fontSize: '13px',
+                                                backgroundColor: '#22c55e',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                                fontWeight: '500'
+                                            }}
+                                            title="下載 CSV 數據"
+                                        >
+                                            📊 下載 CSV
+                                        </button>
+                                        <button
+                                            onClick={() => multiLineChartRef.current && downloadChartAsPNG(multiLineChartRef.current, '綜合分數趨勢')}
+                                            style={{
+                                                padding: '6px 12px',
+                                                fontSize: '13px',
+                                                backgroundColor: '#3b82f6',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                                fontWeight: '500'
+                                            }}
+                                            title="下載 PNG 圖片"
+                                        >
+                                            🖼️ 下載 PNG
+                                        </button>
+                                    </div>
+                                </div>
+                                <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+                                    <ResponsiveContainer
+                                        width={multiLineTrendData.length > 30 ? multiLineTrendData.length * 30 : '100%'}
+                                        height={400}
+                                    >
+                                        <LineChart data={multiLineTrendData}>
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <XAxis dataKey="date" />
+                                            <YAxis label={{ value: '分數', angle: -90, position: 'insideLeft' }} ticks={[12, 24, 45]} domain={[0, 56]} />
+                                            <Tooltip content={<CustomMATooltip />} />
+                                            <Legend formatter={(value) => String(value).includes('-') ? String(value).split('-')[1] : value} />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="當日分數"
+                                                stroke="#f59e0b"
+                                                strokeWidth={2}
+                                                name="1-當日分數"
+                                                dot={{ r: 3 }}
+                                                connectNulls
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="7日平均"
+                                                stroke="#667eea"
+                                                strokeWidth={2.5}
+                                                name="2-7日平均"
+                                                dot={false}
+                                                connectNulls
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="14日平均"
+                                                stroke="#48bb78"
+                                                strokeWidth={2.5}
+                                                name="3-14日平均"
+                                                dot={false}
+                                                connectNulls
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="30日平均"
+                                                stroke="#9f7aea"
+                                                strokeWidth={2.5}
+                                                name="4-30日平均"
+                                                dot={false}
+                                                connectNulls
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
                         );
                     })()}
@@ -331,67 +380,190 @@ export default function PatientDetail() {
 
                     {/* 7日線 */}
                     {chart7Days.length > 0 && (
-                        <div className="chart-section">
-                            <h3 className="section-title">近7天分數趨勢</h3>
-                            <ResponsiveContainer width="100%" height={250}>
-                                <LineChart data={chart7Days}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="date" />
-                                    <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="分數"
-                                        stroke="#667eea"
-                                        strokeWidth={2}
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
+                        <div className="chart-section" ref={chart7DaysRef}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <h3 className="section-title" style={{ margin: 0 }}>近7天分數趨勢</h3>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button
+                                        onClick={() => downloadCSV(chart7Days, '近7天分數趨勢')}
+                                        style={{
+                                            padding: '6px 12px',
+                                            fontSize: '13px',
+                                            backgroundColor: '#22c55e',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontWeight: '500'
+                                        }}
+                                        title="下載 CSV 數據"
+                                    >
+                                        📊 下載 CSV
+                                    </button>
+                                    <button
+                                        onClick={() => chart7DaysRef.current && downloadChartAsPNG(chart7DaysRef.current, '近7天分數趨勢')}
+                                        style={{
+                                            padding: '6px 12px',
+                                            fontSize: '13px',
+                                            backgroundColor: '#3b82f6',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontWeight: '500'
+                                        }}
+                                        title="下載 PNG 圖片"
+                                    >
+                                        🖼️ 下載 PNG
+                                    </button>
+                                </div>
+                            </div>
+                            <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+                                <ResponsiveContainer
+                                    width={chart7Days.length > 30 ? chart7Days.length * 30 : '100%'}
+                                    height={250}
+                                >
+                                    <LineChart data={chart7Days}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="date" />
+                                        <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="分數"
+                                            stroke="#667eea"
+                                            strokeWidth={2}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
                         </div>
                     )}
 
                     {/* 14日線 */}
                     {chart14Days.length > 0 && (
-                        <div className="chart-section">
-                            <h3 className="section-title">近14天分數趨勢</h3>
-                            <ResponsiveContainer width="100%" height={250}>
-                                <LineChart data={chart14Days}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="date" />
-                                    <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="分數"
-                                        stroke="#48bb78"
-                                        strokeWidth={2}
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
+                        <div className="chart-section" ref={chart14DaysRef}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <h3 className="section-title" style={{ margin: 0 }}>近14天分數趨勢</h3>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button
+                                        onClick={() => downloadCSV(chart14Days, '近14天分數趨勢')}
+                                        style={{
+                                            padding: '6px 12px',
+                                            fontSize: '13px',
+                                            backgroundColor: '#22c55e',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontWeight: '500'
+                                        }}
+                                        title="下載 CSV 數據"
+                                    >
+                                        📊 下載 CSV
+                                    </button>
+                                    <button
+                                        onClick={() => chart14DaysRef.current && downloadChartAsPNG(chart14DaysRef.current, '近14天分數趨勢')}
+                                        style={{
+                                            padding: '6px 12px',
+                                            fontSize: '13px',
+                                            backgroundColor: '#3b82f6',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontWeight: '500'
+                                        }}
+                                        title="下載 PNG 圖片"
+                                    >
+                                        🖼️ 下載 PNG
+                                    </button>
+                                </div>
+                            </div>
+                            <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+                                <ResponsiveContainer
+                                    width={chart14Days.length > 30 ? chart14Days.length * 30 : '100%'}
+                                    height={250}
+                                >
+                                    <LineChart data={chart14Days}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="date" />
+                                        <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="分數"
+                                            stroke="#48bb78"
+                                            strokeWidth={2}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
                         </div>
                     )}
 
                     {/* 30日線 */}
                     {chart30Days.length > 0 && (
-                        <div className="chart-section">
-                            <h3 className="section-title">近30天分數趨勢</h3>
-                            <ResponsiveContainer width="100%" height={250}>
-                                <LineChart data={chart30Days}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="date" />
-                                    <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="分數"
-                                        stroke="#9f7aea"
-                                        strokeWidth={2}
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
+                        <div className="chart-section" ref={chart30DaysRef}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <h3 className="section-title" style={{ margin: 0 }}>近30天分數趨勢</h3>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button
+                                        onClick={() => downloadCSV(chart30Days, '近30天分數趨勢')}
+                                        style={{
+                                            padding: '6px 12px',
+                                            fontSize: '13px',
+                                            backgroundColor: '#22c55e',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontWeight: '500'
+                                        }}
+                                        title="下載 CSV 數據"
+                                    >
+                                        📊 下載 CSV
+                                    </button>
+                                    <button
+                                        onClick={() => chart30DaysRef.current && downloadChartAsPNG(chart30DaysRef.current, '近30天分數趨勢')}
+                                        style={{
+                                            padding: '6px 12px',
+                                            fontSize: '13px',
+                                            backgroundColor: '#3b82f6',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontWeight: '500'
+                                        }}
+                                        title="下載 PNG 圖片"
+                                    >
+                                        🖼️ 下載 PNG
+                                    </button>
+                                </div>
+                            </div>
+                            <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+                                <ResponsiveContainer
+                                    width={chart30Days.length > 30 ? chart30Days.length * 30 : '100%'}
+                                    height={250}
+                                >
+                                    <LineChart data={chart30Days}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="date" />
+                                        <YAxis ticks={[12, 24, 45]} domain={[0, 56]} />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="分數"
+                                            stroke="#9f7aea"
+                                            strokeWidth={2}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
                         </div>
                     )}
 
@@ -432,7 +604,7 @@ export default function PatientDetail() {
             ) : activeTab === 'profile' ? (
                 /* Patient Profile Tab */
                 <div className="profile-section">
-                    <h3 className="section-title">病人基本資料</h3>
+                    <h3 className="section-title">個案基本資料</h3>
                     <div className="profile-grid">
                         <div className="profile-item">
                             <span className="profile-label">身份</span>
@@ -535,9 +707,9 @@ export default function PatientDetail() {
             ) : activeTab === 'diary' ? (
                 /* Patient Diary Tab */
                 <div className="diary-section">
-                    <h3 className="section-title">病人日記 (只讀)</h3>
+                    <h3 className="section-title">個案日記 (只讀)</h3>
                     {diaries.length === 0 ? (
-                        <p className="no-data">病人尚未撰寫日記</p>
+                        <p className="no-data">個案尚未撰寫日記</p>
                     ) : (
                         <div className="diaries-container">
                             {diaries.map((diary) => (
@@ -563,9 +735,10 @@ export default function PatientDetail() {
                                     {diary.images && diary.images.length > 0 && (
                                         <div className="diary-images-preview">
                                             {diary.images.slice(0, 3).map((img, idx) => {
+                                                const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
                                                 const imgUrl = img.startsWith('http://') || img.startsWith('https://')
                                                     ? img
-                                                    : `http://localhost:5000${img}`;
+                                                    : `${API_BASE_URL}${img}`;
                                                 return (
                                                     <img key={idx} src={imgUrl} alt="預覽" className="diary-image-thumb" />
                                                 );
@@ -629,9 +802,10 @@ export default function PatientDetail() {
                                             <h4 className="detail-subtitle">照片紀錄：</h4>
                                             <div className="detail-images-grid">
                                                 {selectedDiary.images.map((img, idx) => {
+                                                    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
                                                     const imgUrl = img.startsWith('http://') || img.startsWith('https://')
                                                         ? img
-                                                        : `http://localhost:5000${img}`;
+                                                        : `${API_BASE_URL}${img}`;
                                                     return (
                                                         <a key={idx} href={imgUrl} target="_blank" rel="noopener noreferrer">
                                                             <img src={imgUrl} alt={`附件 ${idx + 1}`} className="diary-full-image" />

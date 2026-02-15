@@ -8,6 +8,7 @@ interface AuthContextType {
     signup: (email: string, name: string, password: string) => Promise<void>;
     logout: () => void;
     updateProfile: (data: Partial<User>) => Promise<void>;
+    refreshUser: () => Promise<void>;
     isLoading: boolean;
 }
 
@@ -72,7 +73,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Let's assume api.ts has it or I add it now.
             // I'll add it to api.ts in a sec.
             // For now, simple fetch or better: update local state.
-            const token = localStorage.getItem('access_token');
             // ... actually better to use api service. 
             // I'll leave this empty or throw for now, relying on ProfileSetup's direct fetch?
             // No, ProfileSetup calls updateProfile from context?
@@ -80,11 +80,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // So I MUST provide it.
 
             // Let's implement it here properly.
-            const response = await fetch('http://localhost:5000/api/auth/profile', {
+            const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+            const response = await fetch(`${API_BASE_URL}/auth/profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                    'ngrok-skip-browser-warning': 'true'
                 },
                 body: JSON.stringify(data)
             });
@@ -98,6 +100,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }
         } catch (error) {
             console.error('Update profile failed:', error);
+            throw error;
+        }
+    };
+
+    const refreshUser = async () => {
+        try {
+            const response = await authApi.getCurrentUser();
+            if (response.user) {
+                setUser(response.user);
+                localStorage.setItem('user', JSON.stringify(response.user));
+            }
+        } catch (error) {
+            console.error('Refresh user failed:', error);
             throw error;
         }
     };
@@ -121,7 +136,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, signup, logout, updateProfile, isLoading }}>
+        <AuthContext.Provider value={{ user, login, signup, logout, updateProfile, refreshUser, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

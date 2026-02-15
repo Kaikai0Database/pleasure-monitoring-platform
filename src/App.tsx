@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { ProfileSetup } from './pages/ProfileSetup';
+import { ConsentPage } from './pages/ConsentPage';
 import { GameMenu } from './pages/GameMenu';
 import { GameAssessment } from './pages/GameAssessment';
 import { GameResult } from './pages/GameResult';
@@ -26,6 +27,7 @@ function App() {
               <Route element={<Layout />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/consent" element={<ConsentPage />} />
                 <Route path="/profile-setup" element={<ProfileSetup />} />
                 <Route path="/" element={<GameMenu />} />
                 <Route path="/history" element={<ScoreHistory />} />

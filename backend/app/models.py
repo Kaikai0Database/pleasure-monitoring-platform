@@ -40,6 +40,7 @@ class User(db.Model):
     religion = db.Column(db.Boolean, nullable=True)
     religion_other = db.Column(db.String(255), nullable=True)
     is_profile_completed = db.Column(db.Boolean, default=False)
+    has_consented = db.Column(db.Boolean, default=False)
     group = db.Column(db.String(20), default='clinical')  # 'student' or 'clinical'
     
     # Relationship
@@ -77,6 +78,7 @@ class User(db.Model):
             'religion': self.religion,
             'religion_other': self.religion_other,
             'group': self.group,
+            'has_consented': self.has_consented,
             'consecutive_days': self.calculate_streak()
         }
 
@@ -127,18 +129,27 @@ class AssessmentHistory(db.Model):
     def to_dict(self):
         """Convert assessment history to dictionary"""
         percentage = round((self.total_score / self.max_score) * 100) if self.max_score > 0 else 0
+        
+        # Safe JSON parsing
+        try:
+            answers_data = json.loads(self.answers) if self.answers else []
+        except (json.JSONDecodeError, ValueError, TypeError) as e:
+            print(f"[WARNING] Invalid JSON in assessment {self.id} answers field: {e}")
+            answers_data = []
+        
         return {
             'id': self.id,
             'total_score': self.total_score,
             'max_score': self.max_score,
             'level': self.level,
             'percentage': percentage,
-            'answers': json.loads(self.answers) if self.answers else [],
+            'answers': answers_data,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
             'is_deleted': self.is_deleted,
             'deleted_at': self.deleted_at.isoformat() if self.deleted_at else None,
             'delete_reason': self.delete_reason
         }
+
 
 
 class Diary(db.Model):

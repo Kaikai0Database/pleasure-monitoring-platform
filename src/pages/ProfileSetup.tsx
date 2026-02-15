@@ -157,7 +157,8 @@ export const ProfileSetup: React.FC = () => {
                         inputMode="numeric"
                         pattern="[0-9]*"
                         maxLength={4}
-                        className="w-24 p-2 border-4 border-black font-pixel text-lg text-center"
+                        className="p-2 border-4 border-black font-pixel text-lg text-center"
+                        style={{ minWidth: '120px', width: '120px' }}
                         value={formData.dob ? formData.dob.split('-')[0] : ''}
                         onChange={e => {
                             const year = e.target.value.replace(/\D/g, '').slice(0, 4);
@@ -343,9 +344,6 @@ export const ProfileSetup: React.FC = () => {
                         </button>
                     ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                    * 70萬以下:清寒, 70-150萬:普通, 150-300萬:小康, 300萬以上:富裕
-                </p>
             </div>
         </div>
     );

@@ -1,0 +1,16 @@
+version: "2"
+authtoken: 348pDD8jsNEh5MULCyOimGQQdfC_3qto6thS1PY1RMKU9DRGz
+
+tunnels:
+  backend:
+    proto: http
+    addr: 5000
+    schemes:
+      - https
+      - http
+  patient-frontend:
+    proto: http
+    addr: 5173
+    schemes:
+      - https
+      - http

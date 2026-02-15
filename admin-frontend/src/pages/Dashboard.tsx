@@ -22,9 +22,12 @@ export default function Dashboard() {
         fetchData();
     }, []);
 
+
     const fetchData = async () => {
         try {
             setLoading(true);
+            setError(''); // Clear previous errors
+
             const [statsRes, patientsRes, alertCountsRes] = await Promise.all([
                 dashboardAPI.getStats(),
                 patientsAPI.getAll(),
@@ -33,23 +36,39 @@ export default function Dashboard() {
 
             if (statsRes.data.success) {
                 setStats(statsRes.data.stats);
+            } else {
+                console.error('[Dashboard] Stats response not successful:', statsRes.data);
+                setError(statsRes.data.message || '獲取統計數據失敗');
             }
+
             if (patientsRes.data.success) {
-                // 顯示所有病人，不篩選
                 setAllPatients(patientsRes.data.patients);
+            } else {
+                console.error('[Dashboard] Patients response not successful:', patientsRes.data);
             }
+
             if (alertCountsRes.data.success) {
                 setAlertCounts(alertCountsRes.data.alert_counts || {});
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || '獲取數據失敗');
+            console.error('[Dashboard] Fetch error:', err);
+            console.error('[Dashboard] Error response:', err.response);
+
+            // Check if it's a JSON parsing error
+            if (err.message && err.message.includes('JSON')) {
+                const errorDetails = `獲取統計數據失敗：伺服器回應格式錯誤 (${err.message})`;
+                setError(errorDetails);
+                console.error('[Dashboard] Raw response:', err.response?.data);
+            } else {
+                setError(err.response?.data?.message || '獲取數據失敗');
+            }
         } finally {
             setLoading(false);
         }
     };
 
     const handleAddToWatchlist = async (patientId: number, e: React.MouseEvent) => {
-        e.stopPropagation(); // 防止觸發病人卡片點擊
+        e.stopPropagation(); // 防止觸發個案卡片點擊
         try {
             await watchlistAPI.add(patientId);
             alert('已添加到特別關注');
@@ -123,7 +142,7 @@ export default function Dashboard() {
                         <div className="stat-icon">👥</div>
                     </div>
                     <div className="stat-content">
-                        <div className="stat-label">總病人數</div>
+                        <div className="stat-label">總個案數</div>
                         <div className="stat-value">{stats?.total_patients || 0}</div>
                     </div>
                 </div>
@@ -163,24 +182,24 @@ export default function Dashboard() {
                         <div className="stat-icon">⭐</div>
                     </div>
                     <div className="stat-content">
-                        <div className="stat-label">特別關注病人</div>
+                        <div className="stat-label">特別關注個案</div>
                         <div className="stat-value">{stats?.watchlist_count || 0}</div>
                     </div>
                 </div>
             </div>
 
-            {/* 所有病人列表 */}
+            {/* 所有個案列表 */}
             <div className="recent-patients-section">
                 <h3 className="section-title">
-                    {groupFilter === 'all' ? '所有病人' :
-                        groupFilter === 'student' ? '大學生組病人' : '臨床組病人'}
+                    {groupFilter === 'all' ? '所有個案' :
+                        groupFilter === 'student' ? '大學生組個案' : '臨床組個案'}
                     <span className="patient-count">（{filteredPatients.length}人）</span>
                 </h3>
 
                 {filteredPatients.length === 0 ? (
                     <p className="no-data">
-                        {groupFilter === 'all' ? '暫無病人數據' :
-                            `目前${groupFilter === 'student' ? '大學生組' : '臨床組'}沒有病人`}
+                        {groupFilter === 'all' ? '暫無個案數據' :
+                            `目前${groupFilter === 'student' ? '大學生組' : '臨床組'}沒有個案`}
                     </p>
                 ) : (
                     <div className="patients-table">
@@ -199,14 +218,6 @@ export default function Dashboard() {
                                                     ⚠️
                                                 </span>
                                             )}
-                                            {groupFilter === 'all' && patient.group && (
-                                                <span
-                                                    className={`group-badge ${patient.group}`}
-                                                    title={patient.group === 'student' ? '大學生組（門檻≥24分）' : '臨床組（門檻≥29分）'}
-                                                >
-                                                    {patient.group === 'student' ? '🎓 大學生組' : '🏥 臨床組'}
-                                                </span>
-                                            )}
                                             {alertCounts[patient.id]?.high?.count > 0 && (
                                                 <span
                                                     className="alert-bell-icon"
@@ -221,6 +232,14 @@ export default function Dashboard() {
                                                     title={`接近${alertCounts[patient.id].low.lines.join('線、')}線`}
                                                 >
                                                     📉
+                                                </span>
+                                            )}
+                                            {groupFilter === 'all' && patient.group && (
+                                                <span
+                                                    className={`group-badge ${patient.group}`}
+                                                    title={patient.group === 'student' ? '大學生組（門檻≥24分）' : '臨床組（門檻≥30分）'}
+                                                >
+                                                    {patient.group === 'student' ? '🎓 大學生組' : '🏥 臨床組'}
                                                 </span>
                                             )}
                                         </div>

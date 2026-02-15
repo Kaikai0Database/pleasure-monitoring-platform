@@ -6,6 +6,7 @@ interface MenuCardProps {
     icon: string;
     onClick?: () => void;
     className?: string;
+    disabled?: boolean;
 }
 
 export const MenuCard: React.FC<MenuCardProps> = ({
@@ -14,23 +15,22 @@ export const MenuCard: React.FC<MenuCardProps> = ({
     icon,
     onClick,
     className = '',
+    disabled = false,
 }) => {
     return (
         <div
-            onClick={onClick}
+            onClick={disabled ? undefined : onClick}
             className={`
-        relative bg-white border-4 border-black p-6 
-        cursor-pointer
-        transition-all duration-200
-        hover:translate-y-[-4px] hover:shadow-[8px_8px_0_0_rgba(0,0,0,1)]
-        active:translate-y-0 active:shadow-[4px_4px_0_0_rgba(0,0,0,1)]
+        pixel-card
+        ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
         ${className}
       `}
+            style={disabled ? { filter: 'grayscale(100%)' } : undefined}
         >
             <div className="flex flex-col items-center text-center space-y-3">
-                <div className="text-4xl">{icon}</div>
-                <h3 className="text-xl font-bold">{title}</h3>
-                <p className="text-sm opacity-80">{description}</p>
+                <div className="text-4xl pixel-icon-bounce">{icon}</div>
+                <h3 className="text-xl font-bold pixel-text-shadow" style={{ color: '#fff' }}>{title}</h3>
+                <p className="text-sm opacity-90 pixel-text-readable" style={{ color: '#cbd5e0' }}>{description}</p>
             </div>
 
             {/* Pixel corner decorations */}

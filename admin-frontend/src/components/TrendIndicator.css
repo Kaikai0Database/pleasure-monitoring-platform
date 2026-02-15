@@ -1,0 +1,26 @@
+.trend-indicators {
+    display: inline-flex;
+    gap: 6px;
+    margin-left: 8px;
+}
+
+.trend-icon {
+    display: inline-block;
+    font-size: 18px;
+    cursor: help;
+    transition: transform 0.2s ease;
+}
+
+.trend-icon:hover {
+    transform: scale(1.2);
+}
+
+.trend-high-alert {
+    /* 穿越警報 - 紫色趨勢圖標 */
+    filter: hue-rotate(270deg);
+}
+
+.trend-low-alert {
+    /* 接近警報 - 黃色警告三角 */
+    opacity: 0.9;
+}

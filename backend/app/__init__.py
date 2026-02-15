@@ -11,14 +11,41 @@ def create_app(config_name='default'):
     # Load configuration
     app.config.from_object(config[config_name])
     
-    # Initialize extensions with more explicit CORS configuration
+    # Initialize extensions with CORS configuration for ngrok support
+    # Use simpler CORS setup to ensure headers are always added
+    import os
+    allowed_origins = os.environ.get('CORS_ALLOWED_ORIGINS', '*').split(',')
     CORS(app, 
-         origins='*',
+         origins=allowed_origins,
          supports_credentials=True,
-         allow_headers=['Content-Type', 'Authorization'],
-         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+         allow_headers=["Content-Type", "Authorization", "ngrok-skip-browser-warning"],
+         expose_headers=["Content-Type", "Authorization"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+    
     db.init_app(app)
     jwt = JWTManager(app)
+    
+    # Middleware to bypass ngrok browser warning and add CORS headers
+    @app.after_request
+    def add_ngrok_headers(response):
+        """Add ngrok-skip-browser-warning header, CORS headers, and cache control"""
+        # Ngrok bypass
+        response.headers['ngrok-skip-browser-warning'] = 'true'
+        
+        # CORS headers
+        # Use first allowed origin from env or *
+        allowed_origins = os.environ.get('CORS_ALLOWED_ORIGINS', '*').split(',')
+        response.headers['Access-Control-Allow-Origin'] = allowed_origins[0] if allowed_origins else '*'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, ngrok-skip-browser-warning'
+        
+        # Cache control headers - prevent browser from caching responses
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        
+        return response
     
     # JWT error handlers
     @jwt.invalid_token_loader
