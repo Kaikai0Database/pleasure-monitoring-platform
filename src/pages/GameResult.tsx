@@ -90,7 +90,7 @@ export const GameResult: React.FC = () => {
                         const result = addXP(xpReward.xp, user.id);
 
                         // 5. 設定 5 小時冷卻（用戶專屬）
-                        console.assert(user.id, "CRITICAL: No UserID found during cooldown save!");
+                        console.assert(!!user?.id, "CRITICAL: No UserID found during cooldown save!");
                         setAssessmentCooldown(user.id);
 
                         // 6. 觸發 PlayerInfo 即時更新

@@ -8,7 +8,6 @@ import { PixelButton } from '../components/ui/PixelButton';
 import { DeleteReasonModal } from '../components/DeleteReasonModal';
 import { getScoreInterpretation } from '../data/questions';
 import { ScoreTrendChart } from '../components/ScoreTrendChart';
-import { Footer } from '../components/Footer';
 
 
 export const ScoreHistory: React.FC = () => {

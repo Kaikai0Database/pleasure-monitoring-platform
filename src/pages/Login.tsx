@@ -53,7 +53,7 @@ export const Login: React.FC = () => {
 
             // If I change it to:
             if (data.user.is_profile_completed) {
-                if (data.user.consecutive_days >= 7) {
+                if ((data.user?.consecutive_days ?? 0) >= 7) {
                     setShowCongratsModal(true);
                     // We don't navigate immediately, wait for modal close
                 } else {

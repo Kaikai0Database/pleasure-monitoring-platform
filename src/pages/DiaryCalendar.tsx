@@ -13,7 +13,6 @@ export const DiaryCalendar: React.FC = () => {
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [diaries, setDiaries] = useState<Diary[]>([]);
-    const [loading, setLoading] = useState(true);
 
     // 輪播狀態：記錄每個日期當前顯示的日記索引
     const [rotatingIndexes, setRotatingIndexes] = useState<Map<number, number>>(new Map());
@@ -27,13 +26,10 @@ export const DiaryCalendar: React.FC = () => {
 
     const loadDiaries = async () => {
         try {
-            setLoading(true);
             const data = await diaryService.getAllDiaries(currentYear, currentMonth);
             setDiaries(data);
         } catch (err) {
             console.error('載入日記失敗:', err);
-        } finally {
-            setLoading(false);
         }
     };
 
