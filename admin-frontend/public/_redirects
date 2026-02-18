@@ -1,7 +1,2 @@
-# Client-side routing paths
-/login /index.html 200
-/dashboard /index.html 200
-/patients /index.html 200
-/watchlist /index.html 200
-/diary /index.html 200
-/assignments /index.html 200
+# SPA Fallback: Redirect all unknown paths to root
+/* / 200
