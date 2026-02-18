@@ -1,1 +1,17 @@
-/* /index.html 200
+# Avoid redirect loop for the index file itself
+/index.html /index.html 200
+
+# Client-side routing paths
+/login /index.html 200
+/diary /index.html 200
+/calendar /index.html 200
+/score /index.html 200
+/game /index.html 200
+/profile /index.html 200
+/signup /index.html 200
+/forgot-password /index.html 200
+/history /index.html 200
+/settings /index.html 200
+
+# Catch-all for other paths (optional, might cause loop if not careful, but typically fine if placed last)
+# /* /index.html 200

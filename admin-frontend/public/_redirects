@@ -1,1 +1,13 @@
-/* /index.html 200
+# Avoid redirect loop for the index file itself
+/index.html /index.html 200
+
+# Client-side routing paths
+/login /index.html 200
+/dashboard /index.html 200
+/patients /index.html 200
+/watchlist /index.html 200
+/diary /index.html 200
+/assignments /index.html 200
+
+# Catch-all
+# /* /index.html 200
