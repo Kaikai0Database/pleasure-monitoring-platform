@@ -23,7 +23,7 @@ def create_app(config_name='default'):
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization", "ngrok-skip-browser-warning"]
         }
-    }, supports_credentials=True)
+    })
 
     db.init_app(app)  # ← 必要：將 db 和 Flask app 連結
     jwt = JWTManager(app)
