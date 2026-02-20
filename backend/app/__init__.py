@@ -11,21 +11,31 @@ def create_app(config_name='default'):
     # Load configuration
     app.config.from_object(config[config_name])
     
-    # Initialize extensions with CORS configuration for ngrok support
-    # Use simpler CORS setup to ensure headers are always added
-    import os
-    # Get CORS_ALLOWED_ORIGINS from env, split by comma if present, else default to "*"
-    allowed_origins_env = os.environ.get('CORS_ALLOWED_ORIGINS')
-    allowed_origins = allowed_origins_env.split(',') if allowed_origins_env else "*"
+    # Initialize extensions with CORS configuration
+    import os, re
     
-    CORS(app, 
-         resources={r"/*": {"origins": allowed_origins}},
-         supports_credentials=True,
-         allow_headers=["Content-Type", "Authorization", "ngrok-skip-browser-warning"],
-         expose_headers=["Content-Type", "Authorization"],
-         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+    # Hardcoded allowed origins: Cloudflare Pages domains + local dev
+    # Flask-CORS supports regex strings in the origins list
+    CLOUDFLARE_PAGES_ORIGINS = [
+        r"https://.*\.pleasure-monitoring-platform\.pages\.dev",  # all preview branches
+        "https://pleasure-monitoring-platform.pages.dev",          # production Pages URL
+        "http://localhost:5173",                                    # local patient dev
+        "http://localhost:5174",                                    # local admin dev
+    ]
     
-    db.init_app(app)
+    # Allow additional origins from env var (comma-separated)
+    env_origins = os.environ.get('CORS_ALLOWED_ORIGINS')
+    if env_origins:
+        CLOUDFLARE_PAGES_ORIGINS.extend(env_origins.split(','))
+    
+    CORS(app,
+         resources={r"/*": {
+             "origins": CLOUDFLARE_PAGES_ORIGINS,
+             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+             "allow_headers": ["Content-Type", "Authorization", "ngrok-skip-browser-warning"]
+         }},
+         supports_credentials=True)
+
     jwt = JWTManager(app)
     
     # Middleware to bypass ngrok browser warning and add CORS headers
