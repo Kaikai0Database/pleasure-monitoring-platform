@@ -11,65 +11,31 @@ def create_app(config_name='default'):
     # Load configuration
     app.config.from_object(config[config_name])
     
-    # Initialize extensions with CORS configuration
-    import os, re
+    # CORS: read from env var, fall back to "*" for local dev
+    import os
+    origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
+    if "," in origins:
+        origins = [o.strip() for o in origins.split(",")]
     
-    # Hardcoded allowed origins: Cloudflare Pages domains + local dev
-    # Flask-CORS supports regex strings in the origins list
-    CLOUDFLARE_PAGES_ORIGINS = [
-        r"https://.*\.pleasure-monitoring-platform\.pages\.dev",  # all preview branches
-        "https://pleasure-monitoring-platform.pages.dev",          # production Pages URL
-        "http://localhost:5173",                                    # local patient dev
-        "http://localhost:5174",                                    # local admin dev
-    ]
-    
-    # Allow additional origins from env var (comma-separated)
-    env_origins = os.environ.get('CORS_ALLOWED_ORIGINS')
-    if env_origins:
-        CLOUDFLARE_PAGES_ORIGINS.extend(env_origins.split(','))
-    
-    CORS(app,
-         resources={r"/*": {
-             "origins": CLOUDFLARE_PAGES_ORIGINS,
-             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-             "allow_headers": ["Content-Type", "Authorization", "ngrok-skip-browser-warning"]
-         }},
-         supports_credentials=True)
+    CORS(app, resources={
+        r"/*": {
+            "origins": origins,
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization", "ngrok-skip-browser-warning"]
+        }
+    }, supports_credentials=True)
 
     jwt = JWTManager(app)
     
-    # Middleware to bypass ngrok browser warning and add CORS headers
+    # Middleware: only add ngrok bypass + cache control headers
+    # Do NOT manually set CORS headers here — let Flask-CORS handle origin reflection
     @app.after_request
-    def add_ngrok_headers(response):
-        """Add ngrok-skip-browser-warning header, CORS headers, and cache control"""
-        # Ngrok bypass
+    def add_cache_and_ngrok_headers(response):
+        """Add ngrok-skip-browser-warning and cache-control headers only"""
         response.headers['ngrok-skip-browser-warning'] = 'true'
-        
-        # CORS headers
-        # Use first allowed origin from env or *
-        # If multiple origins are allowed, we should let Flask-CORS handle it or dynamic check
-        # For this manual header, we will use the same logic:
-        allowed_origins_env = os.environ.get('CORS_ALLOWED_ORIGINS')
-        if allowed_origins_env:
-             # Ideally we check request.origin against list, but for simplicity here:
-             # We can't set multiple in header. Flask-CORS does this. 
-             # Let's keep the manual header strictly for 'ngrok' support or rely on Flask-CORS?
-             # User prompt primarily focused on CORS(app).
-             # I will set it to * if env allows it (not strict) or just let Flask-CORS handle?
-             # Existing code sets it. I will set to the first origin or * to be safe/simple.
-             allowed_list = allowed_origins_env.split(',')
-             response.headers['Access-Control-Allow-Origin'] = allowed_list[0] if allowed_list else '*'
-        else:
-             response.headers['Access-Control-Allow-Origin'] = '*'
-        response.headers['Access-Control-Allow-Credentials'] = 'true'
-        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, ngrok-skip-browser-warning'
-        
-        # Cache control headers - prevent browser from caching responses
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
-        
         return response
     
     # JWT error handlers
