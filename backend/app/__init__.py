@@ -25,6 +25,7 @@ def create_app(config_name='default'):
         }
     }, supports_credentials=True)
 
+    db.init_app(app)  # ← 必要：將 db 和 Flask app 連結
     jwt = JWTManager(app)
     
     # Middleware: only add ngrok bypass + cache control headers
