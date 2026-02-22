@@ -129,3 +129,65 @@
     font-size: calc(8.625rem * var(--font-scale)) !important;
   }
 }
+
+/* ===== RWD 響應式斷點 ===== */
+
+/* 防止水平溢出 */
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* 平板（≤ 768px）*/
+@media (max-width: 768px) {
+  :root {
+    --base-font-size: 20px;
+  }
+
+  /* 修復 iOS Safari 無法處理 fixed 背景的問題 */
+  body {
+    background-attachment: scroll;
+  }
+
+  /* 確保觸控目標至少 44px（Apple/Google 建議最小觸控區域）*/
+  input,
+  button,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  /* PixelCard padding 縮減 */
+  .pixel-card-mobile {
+    padding: 1rem;
+  }
+}
+
+/* 小手機（≤ 480px）*/
+@media (max-width: 480px) {
+  :root {
+    --base-font-size: 18px;
+  }
+
+  /* 確保所有圖片不超出容器 */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* 讓 recharts 圖表不超出容器 */
+  .recharts-wrapper {
+    max-width: 100% !important;
+  }
+
+  /* Pixel 主題裝飾性 box-shadow 縮減，避免超出螢幕邊緣 */
+  .shadow-\[8px_8px_0_0_rgba\(0\,0\,0\,1\)\] {
+    box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 1) !important;
+  }
+
+  /* modal 寬度保護 */
+  .fixed.inset-0>div {
+    max-width: calc(100vw - 2rem);
+  }
+}

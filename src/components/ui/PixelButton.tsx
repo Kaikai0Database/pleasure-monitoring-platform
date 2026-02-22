@@ -23,7 +23,7 @@ export const PixelButton: React.FC<PixelButtonProps> = ({
     const borderStyles = "border-b-4 border-r-4 border-t-2 border-l-2";
 
     const sizeStyles = {
-        sm: "px-4 py-2 text-sm",
+        sm: "px-4 py-2 text-sm min-h-[44px]",
         md: "px-8 py-4 text-xl",
         lg: "px-10 py-5 text-2xl",
     };

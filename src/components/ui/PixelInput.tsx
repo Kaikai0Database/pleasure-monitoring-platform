@@ -10,7 +10,7 @@ export const PixelInput: React.FC<PixelInputProps> = ({ className, endIcon, ...p
         <div className="relative">
             <input
                 className={cn(
-                    'w-full px-4 py-2 font-pixel text-sm border-4 border-gray-800 focus:outline-none focus:border-blue-500',
+                    'w-full min-h-[44px] px-4 py-2 font-pixel text-sm border-4 border-gray-800 focus:outline-none focus:border-blue-500',
                     'placeholder:text-gray-400',
                     endIcon && 'pr-10',
                     className
