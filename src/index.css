@@ -158,9 +158,14 @@ body {
     min-height: 44px;
   }
 
-  /* PixelCard padding 縮減 */
-  .pixel-card-mobile {
-    padding: 1rem;
+  /* PixelCard 手機版縮減 padding，釋放更多寬度給圖表/內容 */
+  .border-4.border-gray-800 {
+    padding: 0.75rem !important;
+  }
+
+  /* Recharts 橫向滾動在 iOS 啟用觸控慣性 */
+  [style*="overflow-x"] {
+    -webkit-overflow-scrolling: touch;
   }
 }
 

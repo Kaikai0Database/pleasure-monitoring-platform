@@ -229,7 +229,7 @@ export const ScoreTrendChart: React.FC<ScoreTrendChartProps> = ({ history }) => 
                         </span>
                     )}
                 </div>
-                <div className="flex gap-2 text-sm">
+                <div className="flex flex-wrap gap-2 text-sm justify-center">
                     <button
                         onClick={() => setViewMode('all')}
                         className={`px-3 py-1 rounded border border-black ${viewMode === 'all' ? 'bg-black text-white' : 'bg-white hover:bg-gray-100'}`}
@@ -269,7 +269,7 @@ export const ScoreTrendChart: React.FC<ScoreTrendChartProps> = ({ history }) => 
                     <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
                         <ResponsiveContainer
                             width={multiLineChartData.length > 30 ? multiLineChartData.length * 30 : '100%'}
-                            height={400}
+                            height={280}
                         >
                             <LineChart data={multiLineChartData}>
                                 <CartesianGrid strokeDasharray="3 3" />
@@ -329,7 +329,7 @@ export const ScoreTrendChart: React.FC<ScoreTrendChartProps> = ({ history }) => 
                     <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
                         <ResponsiveContainer
                             width={combinedChartData.length > 30 ? combinedChartData.length * 30 : '100%'}
-                            height={400}
+                            height={280}
                         >
                             <LineChart data={combinedChartData}>
                                 <CartesianGrid strokeDasharray="3 3" />
@@ -362,7 +362,7 @@ export const ScoreTrendChart: React.FC<ScoreTrendChartProps> = ({ history }) => 
                     <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
                         <ResponsiveContainer
                             width={chart7Days.length > 30 ? chart7Days.length * 30 : '100%'}
-                            height={300}
+                            height={220}
                         >
                             <LineChart data={chart7Days}>
                                 <CartesianGrid strokeDasharray="3 3" />
@@ -388,7 +388,7 @@ export const ScoreTrendChart: React.FC<ScoreTrendChartProps> = ({ history }) => 
                     <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
                         <ResponsiveContainer
                             width={chart14Days.length > 30 ? chart14Days.length * 30 : '100%'}
-                            height={300}
+                            height={220}
                         >
                             <LineChart data={chart14Days}>
                                 <CartesianGrid strokeDasharray="3 3" />
@@ -414,7 +414,7 @@ export const ScoreTrendChart: React.FC<ScoreTrendChartProps> = ({ history }) => 
                     <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
                         <ResponsiveContainer
                             width={chart30Days.length > 30 ? chart30Days.length * 30 : '100%'}
-                            height={300}
+                            height={220}
                         >
                             <LineChart data={chart30Days}>
                                 <CartesianGrid strokeDasharray="3 3" />
