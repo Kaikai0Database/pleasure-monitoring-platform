@@ -109,12 +109,12 @@ export const ScoreHistory: React.FC = () => {
     const currentList = view === 'active' ? history : trash;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-8">
+        <div className="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-4 sm:p-8">
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-4xl font-bold">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4 sm:mb-8">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                        <h1 className="text-xl sm:text-4xl font-bold">
                             {view === 'trash' ? '資源回收桶' : view === 'chart' ? '心情趨勢圖' : '分數歷史'}
                         </h1>
 
@@ -212,10 +212,10 @@ export const ScoreHistory: React.FC = () => {
 
                             return (
                                 <PixelCard key={record.id} className="bg-white">
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-4 mb-2">
-                                                <div className={`px-4 py-2 ${displayColor} text-white font-bold border-2 border-black`}>
+                                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                                                <div className={`px-3 py-1 sm:px-4 sm:py-2 ${displayColor} text-white font-bold border-2 border-black text-sm whitespace-nowrap`}>
                                                     {displayLevel}
                                                 </div>
                                                 <div className="text-sm text-gray-600">
@@ -235,7 +235,7 @@ export const ScoreHistory: React.FC = () => {
                                                 )}
                                             </div>
 
-                                            <div className="flex items-center gap-6">
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-6">
                                                 <div>
                                                     <span className="text-3xl font-bold text-purple-600">
                                                         {record.total_score}
@@ -243,7 +243,7 @@ export const ScoreHistory: React.FC = () => {
                                                     <span className="text-gray-600"> / {record.max_score}</span>
                                                 </div>
 
-                                                <div className="flex-1 h-8 bg-gray-300 border-2 border-black relative overflow-hidden max-w-md">
+                                                <div className="flex-1 min-w-0 h-8 bg-gray-300 border-2 border-black relative overflow-hidden max-w-full sm:max-w-md">
                                                     <div
                                                         className={`h-full ${displayColor} transition-all`}
                                                         style={{ width: `${record.percentage}%` }}
@@ -257,7 +257,7 @@ export const ScoreHistory: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col gap-2 ml-4">
+                                        <div className="flex flex-row sm:flex-col gap-2 ml-0 sm:ml-4 flex-shrink-0">
                                             {view === 'active' ? (
                                                 <PixelButton
                                                     onClick={() => handleDeleteClick(record.id)}
