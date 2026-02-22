@@ -176,17 +176,17 @@ export const DiaryCalendar: React.FC = () => {
                         flex-shrink: 0;
                     }
                     
-                    /* Year/Month title - fluid font-size with clamp */
-                    .calendar-date-title {
-                        font-size: clamp(0.9rem, 3.5vw, 1.2rem) !important;
+                    /* Year/Month title – 使用較高的選擇器優先度以覆蓋 @layer base !important */
+                    h1.calendar-date-title {
+                        font-size: clamp(0.9rem, 4vw, 1.25rem) !important;
                         letter-spacing: -0.02em;
                         flex: 1;
                         text-align: center;
-                        white-space: nowrap;
-                        min-width: fit-content;
-                        padding: 0 8px;
+                        white-space: normal;  /* 允許換行，防止溢出 */
+                        padding: 0 6px;
                         box-sizing: border-box;
-                        overflow: visible;
+                        overflow: hidden;
+                        line-height: 1.2;
                     }
                     
                     /* Subtitle text */
@@ -223,8 +223,8 @@ export const DiaryCalendar: React.FC = () => {
                 }
                 
                 @media (max-width: 480px) {
-                    .calendar-date-title {
-                        font-size: 1rem !important; /* even smaller for tiny screens */
+                    h1.calendar-date-title {
+                        font-size: 1rem !important;
                     }
                     
                     .calendar-nav-button {
@@ -249,7 +249,7 @@ export const DiaryCalendar: React.FC = () => {
                     }
                 }
             `}</style>
-            <div className="min-h-[calc(100vh-100px)] py-8">
+            <div className="min-h-[calc(100vh-100px)] py-8 px-3 sm:px-0">
                 <div className="max-w-6xl mx-auto">
                     {/* 返回主選單按鈕 */}
                     <div className="mb-6">
@@ -271,7 +271,7 @@ export const DiaryCalendar: React.FC = () => {
                                 ← 上個月
                             </button>
 
-                            <h1 className="text-4xl font-bold calendar-date-title">
+                            <h1 className="text-xl sm:text-4xl font-bold calendar-date-title">
                                 {currentYear} 年 {currentMonth} 月
                             </h1>
 
@@ -286,7 +286,7 @@ export const DiaryCalendar: React.FC = () => {
                     </div>
 
                     {/* 日曆 */}
-                    <div className="bg-white border-4 border-gray-300 rounded-lg p-6">
+                    <div className="bg-white border-4 border-gray-300 rounded-lg p-3 sm:p-6">
                         {/* 星期標題 */}
                         <div className="grid grid-cols-7 gap-2 mb-4">
                             {weekDays.map((day) => (
