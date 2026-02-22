@@ -268,10 +268,10 @@ export const Settings: React.FC = () => {
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                             <span className="font-bold">聯絡信箱：</span>
                             <a
-                                href="mailto:123456@live.asia.edu.tw"
+                                href="mailto:yuki88720@gmail.com"
                                 className="text-blue-600 hover:text-blue-800 underline break-all"
                             >
-                                123456@live.asia.edu.tw
+                                yuki88720@gmail.com
                             </a>
                         </div>
                     </div>
