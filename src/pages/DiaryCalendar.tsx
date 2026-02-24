@@ -286,11 +286,11 @@ export const DiaryCalendar: React.FC = () => {
                     </div>
 
                     {/* 日曆 */}
-                    <div className="bg-white border-4 border-gray-300 rounded-lg p-3 sm:p-6">
+                    <div className="bg-white border-4 border-gray-300 rounded-lg p-3 sm:p-6 overflow-x-auto">
                         {/* 星期標題 */}
-                        <div className="grid grid-cols-7 gap-2 mb-4">
+                        <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2 sm:mb-4" style={{ minWidth: '280px' }}>
                             {weekDays.map((day) => (
-                                <div key={day} className="text-center font-bold py-2 bg-yellow-100 border-2 border-yellow-400 rounded">
+                                <div key={day} className="text-center font-bold py-1 sm:py-2 bg-yellow-100 border-2 border-yellow-400 rounded text-xs sm:text-base flex items-center justify-center">
                                     {day}
                                 </div>
                             ))}
@@ -299,7 +299,7 @@ export const DiaryCalendar: React.FC = () => {
                         {/* 日期格子 */}
                         <div className="space-y-2">
                             {calendar.map((week, weekIndex) => (
-                                <div key={weekIndex} className="grid grid-cols-7 gap-2">
+                                <div key={weekIndex} className="grid grid-cols-7 gap-1 sm:gap-2" style={{ minWidth: '280px' }}>
                                     {week.map((day, dayIndex) => {
                                         if (day === null) {
                                             return <div key={dayIndex} className="aspect-square" />;
@@ -349,7 +349,7 @@ export const DiaryCalendar: React.FC = () => {
                                                         <img
                                                             src={getMoodIcon(diary.mood)}
                                                             alt={getMoodName(diary.mood)}
-                                                            className="w-12 h-12 pixelated"
+                                                            className="w-8 h-8 sm:w-12 sm:h-12 pixelated"
                                                         />
                                                     </button>
                                                 )}

@@ -17,7 +17,7 @@ export const PixelButton: React.FC<PixelButtonProps> = ({
     disabled,
     ...props
 }) => {
-    const baseStyles = "relative font-bold font-pixel transition-all disabled:opacity-50 disabled:cursor-not-allowed";
+    const baseStyles = "relative inline-flex items-center justify-center gap-1 font-bold font-pixel transition-all disabled:opacity-50 disabled:cursor-not-allowed";
 
     // Pixel border styles
     const borderStyles = "border-b-4 border-r-4 border-t-2 border-l-2";

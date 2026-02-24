@@ -97,7 +97,7 @@ export const PlayerInfo: React.FC = () => {
                     {/* Welcome Header */}
                     <div className="text-center border-b-4 border-black pb-4">
                         <h2 className="text-2xl font-bold mb-2 pixel-text-shadow">歡迎回來！</h2>
-                        <p className="text-xl font-bold">{user.nickname || user.name}</p>
+                        <p className="text-xl font-bold break-all">{user.nickname || user.name}</p>
                     </div>
 
                     {/* Level and XP */}
