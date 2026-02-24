@@ -184,7 +184,7 @@ export const DiaryEditor: React.FC = () => {
                 <div className="max-w-4xl mx-auto">
                     {/* 標題 */}
                     <div className="mb-8">
-                        <h1 className="text-4xl font-bold mb-2">
+                        <h1 className="text-xl sm:text-4xl font-bold mb-2">
                             {isEditing ? '編輯日記' : '寫日記'}
                         </h1>
                         <p className="text-lg opacity-80">記錄今天的心情與故事</p>

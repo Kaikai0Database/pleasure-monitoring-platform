@@ -69,7 +69,7 @@ export const GameAssessment: React.FC = () => {
             >
                 {/* Content Area - grows to push footer down */}
                 <div
-                    className="flex flex-col items-center p-8"
+                    className="flex flex-col items-center p-4 sm:p-8"
                     style={{
                         flex: 1,
                         justifyContent: 'flex-start',

@@ -127,10 +127,10 @@ export const GameResult: React.FC = () => {
     }, []); // Run once on mount
 
     return (
-        <div className="fixed inset-0 bg-gradient-to-br from-purple-100 to-blue-100 p-8 flex items-center justify-center overflow-y-auto">
+        <div className="fixed inset-0 bg-gradient-to-br from-purple-100 to-blue-100 p-4 sm:p-8 flex items-center justify-center overflow-y-auto">
             <div className="max-w-3xl w-full space-y-6 my-auto">
                 {/* Title */}
-                <h1 className="text-4xl font-bold text-center mb-8">評估結果</h1>
+                <h1 className="text-xl sm:text-4xl font-bold text-center mb-8">評估結果</h1>
 
                 {/* Save Status */}
                 {saveStatus === 'saving' && (
@@ -198,7 +198,7 @@ export const GameResult: React.FC = () => {
                 {/* Answer Summary */}
                 <PixelCard className="bg-white">
                     <h3 className="text-xl font-bold mb-4">您的回答</h3>
-                    <div className="grid grid-cols-7 gap-2">
+                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-1 sm:gap-2">
                         {answers.map((answer, index) => (
                             <div
                                 key={index}
@@ -246,7 +246,7 @@ export const GameResult: React.FC = () => {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex gap-4 justify-center">
+                <div className="flex flex-wrap gap-4 justify-center">
                     <PixelButton onClick={() => navigate('/game/assessment')}>
                         重新測驗
                     </PixelButton>

@@ -29,7 +29,7 @@ export const Layout: React.FC = () => {
         <div className="min-h-screen font-pixel text-gray-900 flex flex-col">
             <header className="p-4">
                 <div className="container mx-auto flex justify-center items-center">
-                    <h1 className="text-4xl font-bold" style={{ color: '#000000', textShadow: '1px 1px 0px #ffffff' }}>失樂感監測平台</h1>
+                    <h1 className="text-xl sm:text-4xl font-bold" style={{ color: '#000000', textShadow: '1px 1px 0px #ffffff' }}>失樂感監測平台</h1>
                 </div>
             </header>
             <main className="container mx-auto p-4 flex-grow">

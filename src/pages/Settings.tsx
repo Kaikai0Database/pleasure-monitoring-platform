@@ -17,11 +17,11 @@ export const Settings: React.FC = () => {
     }
 
     return (
-        <div className="min-h-[calc(100vh-100px)] py-8">
+        <div className="min-h-[calc(100vh-100px)] py-8 px-3 sm:px-0">
             <div className="max-w-4xl mx-auto space-y-8">
                 {/* Page Title */}
                 <div className="text-center">
-                    <h1 className="text-4xl font-bold mb-2">設定</h1>
+                    <h1 className="text-xl sm:text-4xl font-bold mb-2">設定</h1>
                     <p className="text-lg opacity-80">個人資料與偏好設定</p>
                 </div>
 

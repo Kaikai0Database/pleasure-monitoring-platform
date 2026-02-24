@@ -76,17 +76,17 @@ export const DiaryList: React.FC = () => {
                         gap: 1rem;
                     }
                     
-                    .diary-list-title {
-                        font-size: 1.875rem; /* 3xl -> smaller */
+                    h1.diary-list-title {
+                        font-size: 1.25rem !important; /* text-xl equivalent */
                     }
                 }
             `}</style>
-            <div className="min-h-[calc(100vh-100px)] py-8">
+            <div className="min-h-[calc(100vh-100px)] py-8 px-3 sm:px-0">
                 <div className="max-w-6xl mx-auto diary-list-container">
                     {/* 標題與新增按鈕 */}
                     <div className="flex items-center justify-between mb-8 diary-list-header">
                         <div>
-                            <h1 className="text-4xl font-bold mb-2 diary-list-title">我的日記</h1>
+                            <h1 className="text-xl sm:text-4xl font-bold mb-2 diary-list-title">我的日記</h1>
                             <p className="text-lg opacity-80">回顧過去的心情與故事</p>
                         </div>
                         <button
@@ -99,7 +99,7 @@ export const DiaryList: React.FC = () => {
 
                     {/* 篩選器 */}
                     <div className="mb-6 p-4 bg-white border-4 border-gray-300 rounded-lg">
-                        <div className="flex gap-4 items-center">
+                        <div className="flex flex-wrap gap-3 items-center">
                             <span className="font-bold">篩選：</span>
 
                             <select
