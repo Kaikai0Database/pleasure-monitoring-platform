@@ -515,19 +515,25 @@ export const ProfileSetup: React.FC = () => {
                         {step === 4 && renderStep4()}
                     </div>
 
-                    <div className="flex justify-between mt-8 pt-6 border-t-2 border-gray-100">
+                    <div style={{ display: 'flex', flexDirection: 'row', gap: '10px', width: '100%', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '2px solid #f3f4f6' }}>
                         {step > 1 ? (
-                            <PixelButton onClick={prevStep} variant="secondary">上一步</PixelButton>
+                            <div style={{ flex: 1 }}>
+                                <PixelButton onClick={prevStep} variant="secondary" style={{ width: '100%' }}>上一步</PixelButton>
+                            </div>
                         ) : (
-                            <div></div> // Spacer
+                            <div style={{ flex: 1 }} />
                         )}
 
                         {step < 4 ? (
-                            <PixelButton onClick={nextStep} variant="primary" disabled={!canProceed()}>下一步</PixelButton>
+                            <div style={{ flex: 1 }}>
+                                <PixelButton onClick={nextStep} variant="primary" disabled={!canProceed()} style={{ width: '100%' }}>下一步</PixelButton>
+                            </div>
                         ) : (
-                            <PixelButton onClick={handleSubmit} disabled={isLoading || !canProceed()} variant="danger">
-                                {isLoading ? '儲存中...' : '完成並開始'}
-                            </PixelButton>
+                            <div style={{ flex: 1 }}>
+                                <PixelButton onClick={handleSubmit} disabled={isLoading || !canProceed()} variant="danger" style={{ width: '100%' }}>
+                                    {isLoading ? '儲存中...' : '完成並開始'}
+                                </PixelButton>
+                            </div>
                         )}
                     </div>
                 </PixelCard>
