@@ -336,21 +336,65 @@ export const DiaryCalendar: React.FC = () => {
 
                     {/* 標題和月份導航 */}
                     <div className="mb-8">
-                        <div className="mb-4 calendar-header-nav">
+                        {/* Nav row: always single horizontal line */}
+                        <div
+                            className="mb-4"
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem',
+                                width: '100%',
+                            }}
+                        >
                             <button
                                 onClick={previousMonth}
-                                className="px-4 py-2 bg-gray-300 border-4 border-gray-500 rounded-lg font-bold hover:bg-gray-400 calendar-nav-button"
+                                className="bg-gray-300 border-4 border-gray-500 rounded-lg font-bold hover:bg-gray-400"
+                                style={{
+                                    padding: '12px 16px',
+                                    fontSize: '0.95rem',
+                                    whiteSpace: 'nowrap',
+                                    flexShrink: 0,
+                                    cursor: 'pointer',
+                                }}
                             >
                                 ← 上個月
                             </button>
 
-                            <h1 className="font-bold calendar-date-title">
-                                {currentYear}&nbsp;年&nbsp;{currentMonth}&nbsp;月
+                            {/* Year/month title – inline styles win over everything */}
+                            <h1
+                                className="font-bold"
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '4px',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'visible',
+                                    fontSize: '1.4rem',   /* 22px – always visible */
+                                    flex: 1,
+                                    margin: 0,
+                                    minWidth: 'fit-content',
+                                }}
+                            >
+                                <span>{currentYear}</span>
+                                <span>年</span>
+                                <span>{currentMonth}</span>
+                                <span>月</span>
                             </h1>
 
                             <button
                                 onClick={nextMonth}
-                                className="px-4 py-2 bg-gray-300 border-4 border-gray-500 rounded-lg font-bold hover:bg-gray-400 calendar-nav-button"
+                                className="bg-gray-300 border-4 border-gray-500 rounded-lg font-bold hover:bg-gray-400"
+                                style={{
+                                    padding: '12px 16px',
+                                    fontSize: '0.95rem',
+                                    whiteSpace: 'nowrap',
+                                    flexShrink: 0,
+                                    cursor: 'pointer',
+                                }}
                             >
                                 下個月 →
                             </button>
@@ -399,11 +443,36 @@ export const DiaryCalendar: React.FC = () => {
                                 return (
                                     <div
                                         key={`day-${idx}`}
-                                        className="calendar-date-cell"
-                                        style={{ borderColor, background: bgColor }}
                                         onClick={() => handleDateClick(day)}
+                                        style={{
+                                            borderWidth: '3px',
+                                            borderStyle: 'solid',
+                                            borderColor,
+                                            background: bgColor,
+                                            borderRadius: '6px',
+                                            padding: '3px',
+                                            position: 'relative',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            boxSizing: 'border-box',
+                                            aspectRatio: '1 / 1.2',
+                                            cursor: 'pointer',
+                                            imageRendering: 'pixelated',
+                                            minHeight: 0,
+                                        }}
                                     >
-                                        <span className="calendar-day-number">{day}</span>
+                                        {/* Date number – top-left */}
+                                        <span
+                                            style={{
+                                                fontSize: 'clamp(0.5rem, 2.2vw, 0.85rem)',
+                                                fontWeight: 'bold',
+                                                lineHeight: 1,
+                                                alignSelf: 'flex-start',
+                                                padding: '1px 2px',
+                                            }}
+                                        >{day}</span>
 
                                         {/* 生理期標記 */}
                                         {diary?.period_marker && (
@@ -414,33 +483,68 @@ export const DiaryCalendar: React.FC = () => {
                                             />
                                         )}
 
-                                        {/* 情緒圖標 */}
+                                        {/* 情緒圖標 – centre of cell */}
                                         {diary && diary.mood && (
-                                            <div className="flex flex-col items-center justify-center flex-1 hover:scale-105 transition-transform">
+                                            <div
+                                                style={{
+                                                    flex: 1,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                }}
+                                                className="hover:scale-105 transition-transform"
+                                            >
                                                 <img
                                                     src={getMoodIcon(diary.mood)}
                                                     alt={getMoodName(diary.mood)}
-                                                    className="calendar-mood-img"
+                                                    style={{
+                                                        width: 'clamp(16px, 4.5vw, 44px)',
+                                                        height: 'clamp(16px, 4.5vw, 44px)',
+                                                        imageRendering: 'pixelated',
+                                                    }}
                                                 />
                                             </div>
                                         )}
 
-                                        {/* 已有日記：顯示「再寫一篇」按鈕 */}
+                                        {/* 已有日記：「再寫一篇」綠色 + 按鈕（position: absolute, 底右） */}
                                         {dayDiaries.length > 0 && (
                                             <button
                                                 onClick={(e) => handleAddAnother(day, e)}
-                                                className="calendar-add-btn"
                                                 title="再寫一篇"
+                                                style={{
+                                                    position: 'absolute',
+                                                    bottom: '2px',
+                                                    right: '2px',
+                                                    width: 'clamp(14px, 3.5vw, 22px)',
+                                                    height: 'clamp(14px, 3.5vw, 22px)',
+                                                    background: '#22c55e',
+                                                    color: 'white',
+                                                    borderRadius: '50%',
+                                                    fontSize: 'clamp(0.5rem, 1.8vw, 0.75rem)',
+                                                    fontWeight: 'bold',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    lineHeight: 1,
+                                                }}
                                             >
                                                 +
                                             </button>
                                         )}
 
-                                        {/* 沒有日記時顯示 + 號 */}
+                                        {/* 沒有日記時：大 + 號，底部居中 */}
                                         {!diary && (
-                                            <div className="flex items-center justify-center flex-1 hover:scale-105 transition-transform">
-                                                <span className="calendar-plus-label">+</span>
-                                            </div>
+                                            <span
+                                                style={{
+                                                    marginTop: 'auto',
+                                                    fontSize: 'clamp(0.8rem, 3.8vw, 1.4rem)',
+                                                    opacity: 0.35,
+                                                    lineHeight: 1,
+                                                    paddingBottom: '2px',
+                                                }}
+                                            >+</span>
                                         )}
                                     </div>
                                 );

@@ -249,19 +249,46 @@ export const DiaryEditor: React.FC = () => {
                             </div>
                         )}
 
-                        {/* 按鈕 */}
-                        <div className="flex gap-4 diary-button-container">
+                        {/* 按鈕 \u2013 inline styles guarantee single row */}
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                flexWrap: 'nowrap',
+                                gap: '12px',
+                                width: '100%',
+                                padding: '0 0',
+                            }}
+                        >
                             <button
                                 onClick={() => navigate('/diary')}
                                 disabled={loading}
-                                className="flex-1 px-6 py-4 bg-gray-300 border-4 border-gray-500 rounded-lg font-bold text-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors diary-button"
+                                className="bg-gray-300 border-4 border-gray-500 rounded-lg font-bold hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                style={{
+                                    flex: 1,
+                                    minWidth: 0,
+                                    padding: '1rem 0.5rem',
+                                    fontSize: 'clamp(0.85rem, 3.5vw, 1.125rem)',
+                                    whiteSpace: 'nowrap',
+                                    textAlign: 'center',
+                                    cursor: loading ? 'not-allowed' : 'pointer',
+                                }}
                             >
                                 取消
                             </button>
                             <button
                                 onClick={handleSubmit}
                                 disabled={loading || (!mood && !periodMarker)}
-                                className="flex-1 px-6 py-4 bg-yellow-400 border-4 border-yellow-600 rounded-lg font-bold text-lg hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors diary-button"
+                                className="bg-yellow-400 border-4 border-yellow-600 rounded-lg font-bold hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                style={{
+                                    flex: 1,
+                                    minWidth: 0,
+                                    padding: '1rem 0.5rem',
+                                    fontSize: 'clamp(0.85rem, 3.5vw, 1.125rem)',
+                                    whiteSpace: 'nowrap',
+                                    textAlign: 'center',
+                                    cursor: (loading || (!mood && !periodMarker)) ? 'not-allowed' : 'pointer',
+                                }}
                             >
                                 {loading ? '儲存中...' : isEditing ? '更新日記' : '儲存日記'}
                             </button>
