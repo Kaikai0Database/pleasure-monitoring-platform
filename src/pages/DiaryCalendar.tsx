@@ -172,13 +172,19 @@ export const DiaryCalendar: React.FC = () => {
                     flex-shrink: 0;
                 }
 
-                /* Year/month title: single row, no wrap */
+                /* Year/month title: single row, never clips */
                 h1.calendar-date-title {
                     flex: 1;
-                    text-align: center;
+                    /* render as inline-flex so text stays on one line */
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
                     white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+                    overflow: visible;
+                    text-align: center;
+                    font-size: clamp(0.8rem, 3.5vw, 1.5rem);
+                    line-height: 1.2;
                 }
 
                 /* Unified 7-column grid for the entire calendar */
@@ -289,11 +295,11 @@ export const DiaryCalendar: React.FC = () => {
                 /* Mobile overrides */
                 @media (max-width: 600px) {
                     h1.calendar-date-title {
-                        font-size: clamp(0.85rem, 3.5vw, 1.1rem) !important;
+                        font-size: clamp(0.75rem, 3.2vw, 1rem) !important;
                     }
                     .calendar-nav-button {
                         padding: 4px 8px !important;
-                        font-size: 0.8rem;
+                        font-size: 0.75rem;
                     }
                     .calendar-subtitle {
                         font-size: 0.8rem;
@@ -302,11 +308,11 @@ export const DiaryCalendar: React.FC = () => {
 
                 @media (max-width: 400px) {
                     h1.calendar-date-title {
-                        font-size: clamp(0.75rem, 3vw, 0.95rem) !important;
+                        font-size: clamp(0.65rem, 2.8vw, 0.85rem) !important;
                     }
                     .calendar-nav-button {
-                        font-size: 0.7rem;
-                        padding: 3px 6px !important;
+                        font-size: 0.65rem;
+                        padding: 3px 5px !important;
                     }
                 }
             `}</style>
@@ -332,8 +338,8 @@ export const DiaryCalendar: React.FC = () => {
                                 ← 上個月
                             </button>
 
-                            <h1 className="text-xl sm:text-4xl font-bold calendar-date-title">
-                                {currentYear} 年 {currentMonth} 月
+                            <h1 className="font-bold calendar-date-title">
+                                {currentYear}&nbsp;年&nbsp;{currentMonth}&nbsp;月
                             </h1>
 
                             <button
