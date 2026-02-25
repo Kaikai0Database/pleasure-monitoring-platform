@@ -154,98 +154,159 @@ export const DiaryCalendar: React.FC = () => {
     return (
         <>
             <style>{`
-                /* DiaryCalendar Mobile Responsive Styles */
+                /* ── DiaryCalendar: unified calendar grid ── */
+
+                /* Header nav: always single row */
+                .calendar-header-nav {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    gap: 0.5rem;
+                }
+
+                /* Nav buttons: never shrink or wrap */
+                .calendar-nav-button {
+                    white-space: nowrap;
+                    flex-shrink: 0;
+                }
+
+                /* Year/month title: single row, no wrap */
+                h1.calendar-date-title {
+                    flex: 1;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                /* Unified 7-column grid for the entire calendar */
+                .calendar-grid {
+                    display: grid;
+                    grid-template-columns: repeat(7, 1fr);
+                    gap: 2px;
+                    width: 100%;
+                    max-width: 100vw;
+                    box-sizing: border-box;
+                }
+
+                /* Weekday header cells */
+                .calendar-weekday {
+                    text-align: center;
+                    font-weight: bold;
+                    padding: 0.3rem 0.1rem;
+                    font-size: clamp(0.6rem, 2vw, 1rem);
+                    background: #fef9c3;
+                    border: 2px solid #facc15;
+                    border-radius: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    word-break: keep-all;
+                }
+
+                /* Date cells: vertical aspect ratio for diary content */
+                .calendar-date-cell {
+                    aspect-ratio: 1 / 1.2;
+                    border-width: 3px;
+                    border-style: solid;
+                    border-radius: 6px;
+                    padding: 2px;
+                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    box-sizing: border-box;
+                    min-height: 0;
+                    cursor: pointer;
+                    image-rendering: pixelated;
+                }
+
+                /* Empty placeholder cells */
+                .calendar-empty-cell {
+                    aspect-ratio: 1 / 1.2;
+                }
+
+                /* Date number label */
+                .calendar-day-number {
+                    font-size: clamp(0.55rem, 2.5vw, 0.875rem);
+                    font-weight: bold;
+                    line-height: 1;
+                    align-self: flex-start;
+                    padding: 1px 2px;
+                }
+
+                /* Mood icon sizing relative to cell */
+                .calendar-mood-img {
+                    width: clamp(18px, 5vw, 48px);
+                    height: clamp(18px, 5vw, 48px);
+                    image-rendering: pixelated;
+                }
+
+                /* Period marker icon */
+                .calendar-period-img {
+                    width: clamp(10px, 3vw, 20px);
+                    height: clamp(10px, 3vw, 20px);
+                    image-rendering: pixelated;
+                    position: absolute;
+                    top: 2px;
+                    right: 2px;
+                }
+
+                /* Green + add-another button */
+                .calendar-add-btn {
+                    position: absolute;
+                    bottom: 2px;
+                    right: 2px;
+                    width: clamp(14px, 4vw, 24px);
+                    height: clamp(14px, 4vw, 24px);
+                    background: #22c55e;
+                    color: white;
+                    border-radius: 50%;
+                    font-size: clamp(0.5rem, 2vw, 0.75rem);
+                    font-weight: bold;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    line-height: 1;
+                    border: none;
+                    cursor: pointer;
+                }
+                .calendar-add-btn:hover { background: #16a34a; }
+
+                /* Large + for empty dates */
+                .calendar-plus-label {
+                    font-size: clamp(1rem, 5vw, 1.875rem);
+                    opacity: 0.3;
+                }
+
+                /* Subtitle text */
+                .calendar-subtitle {
+                    font-size: 0.875rem;
+                }
+
+                /* Mobile overrides */
                 @media (max-width: 600px) {
-                    /* Calendar header container - flex space-between layout */
-                    .calendar-header-nav {
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        width: 100%;
-                        gap: 2vw;
-                        padding: 0 0.25rem;
+                    h1.calendar-date-title {
+                        font-size: clamp(0.85rem, 3.5vw, 1.1rem) !important;
                     }
-                    
-                    /* Month navigation buttons - prevent overflow */
                     .calendar-nav-button {
-                        white-space: nowrap;
-                        min-width: max-content;
-                        width: max-content;
                         padding: 4px 8px !important;
-                        font-size: 0.85rem;
-                        flex-shrink: 0;
+                        font-size: 0.8rem;
                     }
-                    
-                    /* Year/Month title – 使用較高的選擇器優先度以覆蓋 @layer base !important */
-                    h1.calendar-date-title {
-                        font-size: clamp(0.9rem, 4vw, 1.25rem) !important;
-                        letter-spacing: -0.02em;
-                        flex: 1;
-                        text-align: center;
-                        white-space: normal;  /* 允許換行，防止溢出 */
-                        padding: 0 6px;
-                        box-sizing: border-box;
-                        overflow: hidden;
-                        line-height: 1.2;
-                    }
-                    
-                    /* Subtitle text */
                     .calendar-subtitle {
-                        font-size: 0.875rem;
-                    }
-                    
-                    /* Calendar grid layout - percentage gap for perfect fit */
-                    .calendar-grid {
-                        display: grid;
-                        grid-template-columns: repeat(7, 1fr);
-                        column-gap: 1%;
-                        row-gap: 1%;
-                        width: 100%;
-                    }
-                    
-                    /* Date cell square ratio with minimal padding */
-                    .calendar-date-cell {
-                        aspect-ratio: 1 / 1;
-                        font-size: 0.75rem;
-                        padding: 2px;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    
-                    /* Weekday header - 15% smaller on mobile */
-                    .calendar-weekday {
-                        font-size: 0.85rem;  /* 15% smaller than 1rem */
-                        padding: 0.25rem;
-                        text-align: center;
+                        font-size: 0.8rem;
                     }
                 }
-                
-                @media (max-width: 480px) {
+
+                @media (max-width: 400px) {
                     h1.calendar-date-title {
-                        font-size: 1rem !important;
+                        font-size: clamp(0.75rem, 3vw, 0.95rem) !important;
                     }
-                    
-                    .calendar-nav-button {
-                        font-size: 0.75rem;
-                        padding: 0.4rem 0.6rem !important;
-                    }
-                }
-                
-                @media (max-width: 360px) {
                     .calendar-nav-button {
                         font-size: 0.7rem;
                         padding: 3px 6px !important;
-                    }
-                    
-                    .calendar-date-cell {
-                        font-size: 0.7rem;
-                        padding: 0.15rem;
-                    }
-                    
-                    .calendar-weekday {
-                        font-size: 0.7rem;
                     }
                 }
             `}</style>
@@ -263,7 +324,7 @@ export const DiaryCalendar: React.FC = () => {
 
                     {/* 標題和月份導航 */}
                     <div className="mb-8">
-                        <div className="flex items-center justify-between mb-4 calendar-header-nav">
+                        <div className="mb-4 calendar-header-nav">
                             <button
                                 onClick={previousMonth}
                                 className="px-4 py-2 bg-gray-300 border-4 border-gray-500 rounded-lg font-bold hover:bg-gray-400 calendar-nav-button"
@@ -285,102 +346,93 @@ export const DiaryCalendar: React.FC = () => {
                         <p className="text-lg opacity-80 text-center calendar-subtitle">點擊日期記錄今天的心情</p>
                     </div>
 
-                    {/* 日曆 */}
-                    <div className="bg-white border-4 border-gray-300 rounded-lg p-3 sm:p-6 overflow-x-auto">
-                        {/* 星期標題 */}
-                        <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2 sm:mb-4" style={{ minWidth: '280px' }}>
+                    {/* 日曆 - 統一 7 欄格線 */}
+                    <div className="bg-white border-4 border-gray-300 rounded-lg p-2 sm:p-4" style={{ width: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
+                        <div className="calendar-grid">
+                            {/* 星期標題列 */}
                             {weekDays.map((day) => (
-                                <div key={day} className="text-center font-bold py-1 sm:py-2 bg-yellow-100 border-2 border-yellow-400 rounded text-xs sm:text-base flex items-center justify-center">
+                                <div key={day} className="calendar-weekday">
                                     {day}
                                 </div>
                             ))}
-                        </div>
 
-                        {/* 日期格子 */}
-                        <div className="space-y-2">
-                            {calendar.map((week, weekIndex) => (
-                                <div key={weekIndex} className="grid grid-cols-7 gap-1 sm:gap-2" style={{ minWidth: '280px' }}>
-                                    {week.map((day, dayIndex) => {
-                                        if (day === null) {
-                                            return <div key={dayIndex} className="aspect-square" />;
-                                        }
+                            {/* 日期格子（攤平為單一格線） */}
+                            {calendar.flat().map((day, idx) => {
+                                if (day === null) {
+                                    return <div key={`empty-${idx}`} className="calendar-empty-cell" />;
+                                }
 
-                                        // 獲取該日期的所有日記
-                                        const dayDiaries = getDiariesForDate(day);
-                                        // 獲取當前輪播索引
-                                        const currentIndex = rotatingIndexes.get(day) || 0;
-                                        // 獲取當前顯示的日記
-                                        const diary = dayDiaries[currentIndex];
-                                        const isToday =
-                                            day === new Date().getDate() &&
-                                            currentMonth === new Date().getMonth() + 1 &&
-                                            currentYear === new Date().getFullYear();
+                                // 獲取該日期的所有日記
+                                const dayDiaries = getDiariesForDate(day);
+                                // 獲取當前輪播索引
+                                const currentIndex = rotatingIndexes.get(day) || 0;
+                                // 獲取當前顯示的日記
+                                const diary = dayDiaries[currentIndex];
+                                const isToday =
+                                    day === new Date().getDate() &&
+                                    currentMonth === new Date().getMonth() + 1 &&
+                                    currentYear === new Date().getFullYear();
 
-                                        return (
-                                            <div
-                                                key={dayIndex}
-                                                className={`
-                        aspect-square border-4 rounded-lg p-2 relative
-                        ${isToday
-                                                        ? 'border-blue-500 bg-blue-50'
-                                                        : diary
-                                                            ? 'border-yellow-400 bg-yellow-50'
-                                                            : 'border-gray-300 bg-white hover:border-yellow-300'
-                                                    }
-                      `}
-                                            >
-                                                <div className="text-sm font-bold mb-1">{day}</div>
+                                const borderColor = isToday
+                                    ? '#3b82f6'
+                                    : diary
+                                        ? '#facc15'
+                                        : '#d1d5db';
+                                const bgColor = isToday
+                                    ? '#eff6ff'
+                                    : diary
+                                        ? '#fefce8'
+                                        : '#ffffff';
 
-                                                {/* 生理期標記 - 總是顯示（如果有的話） */}
-                                                {diary?.period_marker && (
-                                                    <img
-                                                        src={PERIOD_MARKER.icon}
-                                                        alt={PERIOD_MARKER.name}
-                                                        className="w-5 h-5 pixelated absolute top-1 right-1"
-                                                    />
-                                                )}
+                                return (
+                                    <div
+                                        key={`day-${idx}`}
+                                        className="calendar-date-cell"
+                                        style={{ borderColor, background: bgColor }}
+                                        onClick={() => handleDateClick(day)}
+                                    >
+                                        <span className="calendar-day-number">{day}</span>
 
-                                                {/* 情緒圖標 */}
-                                                {diary && diary.mood && (
-                                                    <button
-                                                        onClick={() => handleDateClick(day)}
-                                                        className="w-full flex flex-col items-center hover:scale-105 transition-transform"
-                                                    >
-                                                        <img
-                                                            src={getMoodIcon(diary.mood)}
-                                                            alt={getMoodName(diary.mood)}
-                                                            className="w-8 h-8 sm:w-12 sm:h-12 pixelated"
-                                                        />
-                                                    </button>
-                                                )}
+                                        {/* 生理期標記 */}
+                                        {diary?.period_marker && (
+                                            <img
+                                                src={PERIOD_MARKER.icon}
+                                                alt={PERIOD_MARKER.name}
+                                                className="calendar-period-img"
+                                            />
+                                        )}
 
-
-
-                                                {/* 已有日記：顯示「再寫一篇」按鈕 */}
-                                                {dayDiaries.length > 0 && (
-                                                    <button
-                                                        onClick={(e) => handleAddAnother(day, e)}
-                                                        className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 text-white rounded-full text-xs font-bold hover:bg-green-600 transition-colors flex items-center justify-center"
-                                                        title="再寫一篇"
-                                                    >
-                                                        +
-                                                    </button>
-                                                )}
-
-                                                {/* 沒有日記時顯示 + 號 */}
-                                                {!diary && (
-                                                    <button
-                                                        onClick={() => handleDateClick(day)}
-                                                        className="w-full h-full flex items-center justify-center hover:scale-105 transition-transform"
-                                                    >
-                                                        <div className="text-3xl opacity-30">+</div>
-                                                    </button>
-                                                )}
+                                        {/* 情緒圖標 */}
+                                        {diary && diary.mood && (
+                                            <div className="flex flex-col items-center justify-center flex-1 hover:scale-105 transition-transform">
+                                                <img
+                                                    src={getMoodIcon(diary.mood)}
+                                                    alt={getMoodName(diary.mood)}
+                                                    className="calendar-mood-img"
+                                                />
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                            ))}
+                                        )}
+
+                                        {/* 已有日記：顯示「再寫一篇」按鈕 */}
+                                        {dayDiaries.length > 0 && (
+                                            <button
+                                                onClick={(e) => handleAddAnother(day, e)}
+                                                className="calendar-add-btn"
+                                                title="再寫一篇"
+                                            >
+                                                +
+                                            </button>
+                                        )}
+
+                                        {/* 沒有日記時顯示 + 號 */}
+                                        {!diary && (
+                                            <div className="flex items-center justify-center flex-1 hover:scale-105 transition-transform">
+                                                <span className="calendar-plus-label">+</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
