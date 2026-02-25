@@ -450,77 +450,77 @@ export const DiaryCalendar: React.FC = () => {
                                             borderColor,
                                             background: bgColor,
                                             borderRadius: '6px',
-                                            padding: '3px',
                                             position: 'relative',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
                                             boxSizing: 'border-box',
                                             aspectRatio: '1 / 1.2',
                                             cursor: 'pointer',
                                             imageRendering: 'pixelated',
-                                            minHeight: 0,
+                                            overflow: 'hidden',
                                         }}
                                     >
-                                        {/* Date number – top-left */}
+                                        {/* Date number – always top-left, absolute */}
                                         <span
                                             style={{
+                                                position: 'absolute',
+                                                top: '2px',
+                                                left: '3px',
                                                 fontSize: 'clamp(0.5rem, 2.2vw, 0.85rem)',
                                                 fontWeight: 'bold',
                                                 lineHeight: 1,
-                                                alignSelf: 'flex-start',
-                                                padding: '1px 2px',
+                                                zIndex: 1,
                                             }}
                                         >{day}</span>
 
-                                        {/* 生理期標記 */}
+                                        {/* 生理期標記 – top-right absolute */}
                                         {diary?.period_marker && (
                                             <img
                                                 src={PERIOD_MARKER.icon}
                                                 alt={PERIOD_MARKER.name}
-                                                className="calendar-period-img"
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '2px',
+                                                    right: '2px',
+                                                    width: 'clamp(10px, 2.5vw, 18px)',
+                                                    height: 'clamp(10px, 2.5vw, 18px)',
+                                                    imageRendering: 'pixelated',
+                                                    zIndex: 2,
+                                                }}
                                             />
                                         )}
 
-                                        {/* 情緒圖標 – centre of cell */}
+                                        {/* 情緒圖標 – absolute centered in cell */}
                                         {diary && diary.mood && (
-                                            <div
+                                            <img
+                                                src={getMoodIcon(diary.mood)}
+                                                alt={getMoodName(diary.mood)}
                                                 style={{
-                                                    flex: 1,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
+                                                    position: 'absolute',
+                                                    top: '50%',
+                                                    left: '50%',
+                                                    transform: 'translate(-50%, -50%)',
+                                                    width: 'clamp(16px, 4.5vw, 44px)',
+                                                    height: 'clamp(16px, 4.5vw, 44px)',
+                                                    imageRendering: 'pixelated',
+                                                    zIndex: 2,
                                                 }}
-                                                className="hover:scale-105 transition-transform"
-                                            >
-                                                <img
-                                                    src={getMoodIcon(diary.mood)}
-                                                    alt={getMoodName(diary.mood)}
-                                                    style={{
-                                                        width: 'clamp(16px, 4.5vw, 44px)',
-                                                        height: 'clamp(16px, 4.5vw, 44px)',
-                                                        imageRendering: 'pixelated',
-                                                    }}
-                                                />
-                                            </div>
+                                            />
                                         )}
 
-                                        {/* 已有日記：「再寫一篇」綠色 + 按鈕（position: absolute, 底右） */}
+                                        {/* 已有日記：綠色 + 未鑑 – bottom-right, z-index above mood icon */}
                                         {dayDiaries.length > 0 && (
                                             <button
                                                 onClick={(e) => handleAddAnother(day, e)}
                                                 title="再寫一篇"
                                                 style={{
                                                     position: 'absolute',
-                                                    bottom: '2px',
-                                                    right: '2px',
-                                                    width: 'clamp(14px, 3.5vw, 22px)',
-                                                    height: 'clamp(14px, 3.5vw, 22px)',
+                                                    bottom: '4px',
+                                                    right: '4px',
+                                                    width: '20px',
+                                                    height: '20px',
                                                     background: '#22c55e',
                                                     color: 'white',
                                                     borderRadius: '50%',
-                                                    fontSize: 'clamp(0.5rem, 1.8vw, 0.75rem)',
+                                                    fontSize: '14px',
                                                     fontWeight: 'bold',
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -528,21 +528,26 @@ export const DiaryCalendar: React.FC = () => {
                                                     border: 'none',
                                                     cursor: 'pointer',
                                                     lineHeight: 1,
+                                                    zIndex: 10,
+                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
                                                 }}
                                             >
                                                 +
                                             </button>
                                         )}
 
-                                        {/* 沒有日記時：大 + 號，底部居中 */}
+                                        {/* 沒有日記：大 + 號 – absolute centered at bottom */}
                                         {!diary && (
                                             <span
                                                 style={{
-                                                    marginTop: 'auto',
-                                                    fontSize: 'clamp(0.8rem, 3.8vw, 1.4rem)',
+                                                    position: 'absolute',
+                                                    bottom: '6px',
+                                                    left: '50%',
+                                                    transform: 'translateX(-50%)',
+                                                    fontSize: 'clamp(0.85rem, 4vw, 1.5rem)',
                                                     opacity: 0.35,
                                                     lineHeight: 1,
-                                                    paddingBottom: '2px',
+                                                    pointerEvents: 'none',
                                                 }}
                                             >+</span>
                                         )}
