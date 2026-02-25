@@ -407,8 +407,155 @@
     25% {
         transform: translateY(-3px);
     }
+}
 
-    75% {
-        transform: translateY(3px);
+/* ══════════════════════════════════════
+   Mobile  ≤ 768px
+══════════════════════════════════════ */
+@media (max-width: 768px) {
+
+    /* Page header */
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        font-size: 22px;
+    }
+
+    .group-filter-select {
+        width: 100%;
+        font-size: 14px;
+        min-width: unset;
+    }
+
+    /* Stats grid: 2 cols on mobile */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        padding: 14px;
+        gap: 6px;
+    }
+
+    .stat-icon {
+        font-size: 28px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+    }
+
+    .stat-value {
+        font-size: 22px;
+    }
+
+    /* Section */
+    .recent-patients-section {
+        padding: 14px;
+    }
+
+    .section-title {
+        font-size: 18px;
+    }
+
+    .patient-count {
+        font-size: 15px;
+    }
+
+    /* Patient cards: stack vertically */
+    .patient-row {
+        /* override horizontal flex → vertical column */
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        /* remove the horizontal slide hover so layout stays clean */
+        transform: none !important;
+    }
+
+    .patient-row:hover {
+        transform: none !important;
+    }
+
+    /* Info section fills full width */
+    .patient-info-section {
+        width: 100%;
+    }
+
+    /* Name: shrink from 26px to readable mobile size */
+    .patient-name-text {
+        font-size: 16px !important;
+        white-space: normal;
+        /* allow wrapping on mobile */
+        flex-wrap: wrap;
+    }
+
+    /* Email: shrink */
+    .patient-email-text {
+        font-size: 13px !important;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+
+    /* Score section: inline row, no side margins */
+    .patient-score-section {
+        margin: 0;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .score-label {
+        font-size: 13px !important;
+    }
+
+    .score-text {
+        font-size: 16px !important;
+    }
+
+    .no-assessment {
+        font-size: 13px !important;
+    }
+
+    /* Action buttons: full width */
+    .patient-actions {
+        width: 100%;
+    }
+
+    .watchlist-add-btn {
+        width: 100%;
+        font-size: 14px;
+        padding: 10px 12px;
+        text-align: center;
+    }
+
+    /* Group badge: slightly smaller */
+    .group-badge {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+}
+
+/* Very small phones ≤ 400px */
+@media (max-width: 400px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .stat-value {
+        font-size: 18px;
     }
 }
