@@ -151,14 +151,21 @@ export const ProfileSetup: React.FC = () => {
             </div>
             <div>
                 <Label>出生年月日</Label>
-                <div className="flex gap-2 items-center">
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: '4px',
+                    width: '100%',
+                    overflow: 'hidden',
+                }}>
                     <input
                         type="text"
                         inputMode="numeric"
                         pattern="[0-9]*"
                         maxLength={4}
                         className="p-2 border-4 border-black font-pixel text-lg text-center"
-                        style={{ minWidth: '120px', width: '120px' }}
+                        style={{ flex: 2, minWidth: 0 }}
                         value={formData.dob ? formData.dob.split('-')[0] : ''}
                         onChange={e => {
                             const year = e.target.value.replace(/\D/g, '').slice(0, 4);
@@ -168,13 +175,14 @@ export const ProfileSetup: React.FC = () => {
                         }}
                         placeholder="年"
                     />
-                    <span className="text-xl font-bold">年</span>
+                    <span className="text-xl font-bold" style={{ flexShrink: 0 }}>年</span>
                     <input
                         type="text"
                         inputMode="numeric"
                         pattern="[0-9]*"
                         maxLength={2}
-                        className="w-16 p-2 border-4 border-black font-pixel text-lg text-center"
+                        className="p-2 border-4 border-black font-pixel text-lg text-center"
+                        style={{ flex: 1, minWidth: 0 }}
                         value={formData.dob ? formData.dob.split('-')[1] : ''}
                         onChange={e => {
                             const month = e.target.value.replace(/\D/g, '').slice(0, 2);
@@ -184,13 +192,14 @@ export const ProfileSetup: React.FC = () => {
                         }}
                         placeholder="月"
                     />
-                    <span className="text-xl font-bold">月</span>
+                    <span className="text-xl font-bold" style={{ flexShrink: 0 }}>月</span>
                     <input
                         type="text"
                         inputMode="numeric"
                         pattern="[0-9]*"
                         maxLength={2}
-                        className="w-16 p-2 border-4 border-black font-pixel text-lg text-center"
+                        className="p-2 border-4 border-black font-pixel text-lg text-center"
+                        style={{ flex: 1, minWidth: 0 }}
                         value={formData.dob ? formData.dob.split('-')[2] : ''}
                         onChange={e => {
                             const day = e.target.value.replace(/\D/g, '').slice(0, 2);
@@ -200,7 +209,7 @@ export const ProfileSetup: React.FC = () => {
                         }}
                         placeholder="日"
                     />
-                    <span className="text-xl font-bold">日</span>
+                    <span className="text-xl font-bold" style={{ flexShrink: 0 }}>日</span>
                 </div>
             </div>
             <div>
