@@ -99,19 +99,16 @@ export const DiaryCalendar: React.FC = () => {
         return () => clearInterval(interval);
     }, [diaries, currentYear, currentMonth]);
 
-    // 處理日期點擊（支援多筆日記）
+    // 處理日期點擊：沒有日記→直接新增；有日記（不論根數）→開啟列表彈窗
     const handleDateClick = (day: number) => {
         const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const dayDiaries = getDiariesForDate(day);
 
         if (dayDiaries.length === 0) {
-            // 沒有日記：新增
+            // 沒有日記：直接開啟編輯器
             navigate(`/diary/new?date=${dateStr}`);
-        } else if (dayDiaries.length === 1) {
-            // 一篇日記：直接編輯
-            navigate(`/diary/edit/${dayDiaries[0].id}`);
         } else {
-            // 多筆日記：顯示選擇彈窗
+            // 有日記（一篇或多篇）：開啟列表彈窗，讓使用者自行選擇編輯或再寫一篇
             setSelectedDateDiaries(dayDiaries);
         }
     };
@@ -506,35 +503,7 @@ export const DiaryCalendar: React.FC = () => {
                                             />
                                         )}
 
-                                        {/* 已有日記：綠色 + 未鑑 – bottom-right, z-index above mood icon */}
-                                        {dayDiaries.length > 0 && (
-                                            <button
-                                                onClick={(e) => handleAddAnother(day, e)}
-                                                title="再寫一篇"
-                                                style={{
-                                                    position: 'absolute',
-                                                    bottom: '4px',
-                                                    right: '4px',
-                                                    width: '20px',
-                                                    height: '20px',
-                                                    background: '#22c55e',
-                                                    color: 'white',
-                                                    borderRadius: '50%',
-                                                    fontSize: '14px',
-                                                    fontWeight: 'bold',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    border: 'none',
-                                                    cursor: 'pointer',
-                                                    lineHeight: 1,
-                                                    zIndex: 10,
-                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-                                                }}
-                                            >
-                                                +
-                                            </button>
-                                        )}
+                                        {/* 已有日記：綠色 + 按鈕已移至彈窗底部 */}
 
                                         {/* 沒有日記：大 + 號 – absolute centered at bottom */}
                                         {!diary && (

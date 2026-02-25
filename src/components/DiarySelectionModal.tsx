@@ -104,9 +104,18 @@ export const DiarySelectionModal: React.FC<DiarySelectionModalProps> = ({
 
                     <button
                         onClick={onAddNew}
-                        className="w-full py-4 bg-green-500 text-white rounded-xl font-bold hover:bg-green-600 transition-colors flex items-center justify-center gap-2 text-lg shadow-md hover:shadow-lg transform active:scale-[0.98]"
+                        className="border-4 border-green-700 rounded-xl font-bold hover:bg-green-600 transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.98]"
+                        style={{
+                            width: '100%',
+                            padding: '1rem',
+                            background: '#22c55e',
+                            color: 'white',
+                            fontSize: '1.1rem',
+                            imageRendering: 'pixelated',
+                        }}
                     >
-                        <span className="text-2xl">+</span> 再寫一篇日記
+                        <span style={{ fontSize: '1.3rem', fontWeight: 900 }}>+</span>
+                        &nbsp;再寫一篇日記
                     </button>
                 </div>
             </div>
