@@ -175,16 +175,17 @@ export const DiaryCalendar: React.FC = () => {
                 /* Year/month title: single row, never clips */
                 h1.calendar-date-title {
                     flex: 1;
-                    /* render as inline-flex so text stays on one line */
                     display: flex;
                     flex-direction: row;
                     align-items: center;
                     justify-content: center;
+                    gap: 4px;
                     white-space: nowrap;
                     overflow: visible;
                     text-align: center;
-                    font-size: clamp(0.8rem, 3.5vw, 1.5rem);
+                    font-size: 1.5rem;   /* desktop default */
                     line-height: 1.2;
+                    margin: 0;
                 }
 
                 /* Unified 7-column grid for the entire calendar */
@@ -212,17 +213,18 @@ export const DiaryCalendar: React.FC = () => {
                     word-break: keep-all;
                 }
 
-                /* Date cells: vertical aspect ratio for diary content */
+                /* Date cells: top = date number, bottom = + sign */
                 .calendar-date-cell {
                     aspect-ratio: 1 / 1.2;
                     border-width: 3px;
                     border-style: solid;
                     border-radius: 6px;
-                    padding: 2px;
+                    padding: 2px 2px 3px;
                     position: relative;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
+                    justify-content: space-between;
                     box-sizing: border-box;
                     min-height: 0;
                     cursor: pointer;
@@ -281,10 +283,13 @@ export const DiaryCalendar: React.FC = () => {
                 }
                 .calendar-add-btn:hover { background: #16a34a; }
 
-                /* Large + for empty dates */
+                /* + for empty dates – pinned to bottom, centered */
                 .calendar-plus-label {
-                    font-size: clamp(1rem, 5vw, 1.875rem);
-                    opacity: 0.3;
+                    font-size: clamp(0.85rem, 4vw, 1.5rem);
+                    opacity: 0.35;
+                    line-height: 1;
+                    /* ensure it sits at the bottom half of the cell */
+                    margin-top: auto;
                 }
 
                 /* Subtitle text */
@@ -292,27 +297,28 @@ export const DiaryCalendar: React.FC = () => {
                     font-size: 0.875rem;
                 }
 
-                /* Mobile overrides */
+                /* Mobile overrides ≤600px */
                 @media (max-width: 600px) {
                     h1.calendar-date-title {
-                        font-size: clamp(0.75rem, 3.2vw, 1rem) !important;
+                        font-size: 1.2rem !important;  /* 20px – clearly readable */
                     }
                     .calendar-nav-button {
-                        padding: 4px 8px !important;
-                        font-size: 0.75rem;
+                        padding: 8px 12px !important;
+                        font-size: 0.85rem;
                     }
                     .calendar-subtitle {
                         font-size: 0.8rem;
                     }
                 }
 
-                @media (max-width: 400px) {
+                /* Very small phones ≤380px */
+                @media (max-width: 380px) {
                     h1.calendar-date-title {
-                        font-size: clamp(0.65rem, 2.8vw, 0.85rem) !important;
+                        font-size: 1rem !important;
                     }
                     .calendar-nav-button {
-                        font-size: 0.65rem;
-                        padding: 3px 5px !important;
+                        font-size: 0.75rem;
+                        padding: 6px 8px !important;
                     }
                 }
             `}</style>

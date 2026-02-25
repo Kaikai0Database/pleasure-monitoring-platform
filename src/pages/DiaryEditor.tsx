@@ -154,22 +154,25 @@ export const DiaryEditor: React.FC = () => {
                         width: 100%;
                         word-break: break-word;
                     }
-                    
-                    /* Button row – always horizontal, never wraps */
-                    .diary-button-container {
-                        flex-direction: row !important;
-                        flex-wrap: nowrap !important;
-                        gap: 0.75rem;
-                        width: 100%;
-                    }
-                    
-                    .diary-button {
-                        flex: 1;
-                        min-width: 0;
-                        font-size: clamp(0.8rem, 3.5vw, 1.125rem) !important;
-                        padding: 0.75rem 0.5rem !important;
-                        white-space: nowrap;
-                    }
+                }
+
+                /* ── Button row: always horizontal on ALL screen sizes ── */
+                .diary-button-container {
+                    display: flex;
+                    flex-direction: row !important;
+                    flex-wrap: nowrap !important;
+                    gap: 12px;
+                    width: 100%;
+                }
+
+                .diary-button {
+                    flex: 1;
+                    min-width: 0;
+                    /* scale font so text never wraps inside button */
+                    font-size: clamp(0.85rem, 3.5vw, 1.125rem) !important;
+                    padding: 1rem 0.5rem !important;
+                    white-space: nowrap;
+                    text-align: center;
                 }
                 
                 @media (max-width: 480px) {
