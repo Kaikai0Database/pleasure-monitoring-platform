@@ -622,3 +622,163 @@
     padding: 40px;
     font-size: 24px;
 }
+
+/* ══════════════════════════════════════
+   手機版  < 768px
+══════════════════════════════════════ */
+@media (max-width: 767px) {
+
+    /* ── 1. 頂部導覽列：按鈕單行且平分寬度 ── */
+    .detail-header {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .back-button {
+        flex: 1;
+        min-width: 0;
+        font-size: 14px;
+        padding: 8px 12px;
+        text-align: center;
+    }
+
+    .header-actions {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .watchlist-button {
+        width: 100%;
+        font-size: 13px;
+        padding: 8px 10px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    /* ── 個案資訊卡片 ── */
+    .patient-info-card {
+        padding: 16px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .patient-avatar-large {
+        width: 56px;
+        height: 56px;
+        font-size: 28px;
+    }
+
+    .patient-name-large {
+        font-size: 1.2rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        font-size: 13px;
+        word-break: break-all;
+    }
+
+    /* ── 2. Tab 標籤：水平滾動，修掉 margin-bottom 重疊 ── */
+    .tab-navigation {
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+        gap: 4px;
+        padding-bottom: 0;
+        border-bottom: 2px solid #e2e8f0;
+        /* 隱藏手機版滾動條 */
+        scrollbar-width: none;
+    }
+
+    .tab-navigation::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab-button {
+        flex-shrink: 0;
+        /* 不讓按鈕被壓縮 */
+        font-size: 14px;
+        padding: 10px 14px;
+        margin-bottom: 0;
+        /* 移除 -14px 重疊 */
+    }
+
+    /* ── 3. 圖表區塊：防壓扁 + 下載按鈕換行 ── */
+    .chart-section {
+        padding: 14px;
+        margin-bottom: 14px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    /* 圖表標題列：改為換行，下載按鈕降到下一行 */
+    .chart-section>div:first-child {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    /* 下載按鈕容器改為並排縮小 */
+    .chart-section>div:first-child>div {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+    }
+
+    /* 圖表外層容器保證高度 */
+    .chart-section>div:last-child {
+        min-height: 280px;
+    }
+
+    /* ── section 版面縮小 ── */
+    .history-section,
+    .profile-section,
+    .diary-section {
+        padding: 14px;
+    }
+
+    /* ── profile grid 單欄 ── */
+    .profile-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .profile-label {
+        font-size: 13px;
+    }
+
+    .profile-value {
+        font-size: 15px;
+    }
+
+    /* ── history table 字體縮小 ── */
+    .history-table th,
+    .history-table td {
+        font-size: 13px;
+        padding: 10px 8px;
+    }
+
+    /* ── diary modal 適應手機 ── */
+    .diary-modal {
+        padding: 16px;
+    }
+
+    .modal-title {
+        font-size: 20px;
+    }
+
+    .diary-modal-date {
+        font-size: 14px;
+    }
+
+    .content-text {
+        font-size: 15px;
+        padding: 14px;
+    }
+}
