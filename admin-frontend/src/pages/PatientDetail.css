@@ -630,9 +630,13 @@
 
     /* ── 1. 頂部導覽列：按鈕單行且平分寬度 ── */
     .detail-header {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        /* 強制單行 */
+        justify-content: flex-start;
+        /* 不要 space-between */
         gap: 10px;
         margin-bottom: 16px;
+        width: 100%;
     }
 
     .back-button {
@@ -704,6 +708,8 @@
         padding: 10px 14px;
         margin-bottom: 0;
         /* 移除 -14px 重疊 */
+        white-space: nowrap;
+        /* 防止標籤文字斷行 */
     }
 
     /* ── 3. 圖表區塊：防壓扁 + 下載按鈕換行 ── */
@@ -733,7 +739,8 @@
 
     /* 圖表外層容器保證高度 */
     .chart-section>div:last-child {
-        min-height: 280px;
+        min-height: 300px;
+        /* 防止圖表被壓扁 */
     }
 
     /* ── section 版面縮小 ── */
