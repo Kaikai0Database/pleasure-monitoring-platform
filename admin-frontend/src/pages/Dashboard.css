@@ -140,27 +140,54 @@
     gap: 12px;
 }
 
+/* ── Patient row: mobile-first ── */
 .patient-row {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
+    flex-direction: column;
+    /* 手機：縱向堆疊 */
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
     background: #f7fafc;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
     border: 2px solid transparent;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .patient-row:hover {
     background: #edf2f7;
     border-color: #667eea;
-    transform: translateX(4px);
+}
+
+/* 電腦版：橫向並排 */
+@media (min-width: 768px) {
+    .patient-row {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0;
+        padding: 16px 20px;
+    }
+
+    .patient-row:hover {
+        transform: translateX(4px);
+    }
 }
 
 .patient-info-section {
-    flex: 1;
+    width: 100%;
+    /* 手機：滿版 */
     min-width: 0;
+}
+
+@media (min-width: 768px) {
+    .patient-info-section {
+        flex: 1;
+        width: auto;
+    }
 }
 
 .patient-name-email {
@@ -170,15 +197,25 @@
 }
 
 .patient-name-text {
-    font-size: 26px !important;
+    font-size: 16px !important;
+    /* 手機 */
     font-weight: 600;
     color: #2d3748;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     display: flex;
     align-items: center;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+    white-space: normal;
+}
+
+@media (min-width: 768px) {
+    .patient-name-text {
+        font-size: 20px !important;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 .inactive-warning-icon {
@@ -201,29 +238,60 @@
 }
 
 .patient-email-text {
-    font-size: 23px !important;
+    font-size: 12px !important;
+    /* 手機 */
     color: #718096;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+@media (min-width: 768px) {
+    .patient-email-text {
+        font-size: 14px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 .patient-score-section {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin: 0 20px;
+    gap: 8px;
+    margin: 0;
+    /* 手機：無側邊距 */
+    flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+    .patient-score-section {
+        margin: 0 20px;
+        flex-wrap: nowrap;
+        gap: 12px;
+    }
 }
 
 .score-label {
-    font-size: 22px !important;
+    font-size: 13px !important;
+    /* 手機 */
     color: #a0aec0;
 }
 
 .score-text {
-    font-size: 26px !important;
+    font-size: 15px !important;
+    /* 手機 */
     font-weight: 600;
     color: #2d3748;
+}
+
+@media (min-width: 768px) {
+    .score-label {
+        font-size: 18px !important;
+    }
+
+    .score-text {
+        font-size: 20px !important;
+    }
 }
 
 .score-percentage {
@@ -249,25 +317,51 @@
 }
 
 .no-assessment {
-    font-size: 23px !important;
+    font-size: 13px !important;
+    /* 手機 */
     color: #a0aec0;
     font-style: italic;
+}
+
+@media (min-width: 768px) {
+    .no-assessment {
+        font-size: 16px !important;
+    }
 }
 
 .patient-actions {
     display: flex;
     gap: 8px;
+    width: 100%;
+    /* 手機：佔滿 */
 }
 
 .watchlist-add-btn {
-    padding: 8px 16px;
+    padding: 10px 14px;
     border: none;
     border-radius: 6px;
-    font-size: 23px;
+    font-size: 14px;
+    /* 手機 */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    width: 100%;
+    /* 手機：按鈕佔滿 */
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .patient-actions {
+        width: auto;
+        flex-shrink: 0;
+    }
+
+    .watchlist-add-btn {
+        width: auto;
+        font-size: 16px;
+        padding: 8px 16px;
+    }
 }
 
 /* Active state - patient is in watchlist */
