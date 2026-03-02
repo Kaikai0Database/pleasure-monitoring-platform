@@ -737,11 +737,6 @@
         width: 100%;
     }
 
-    /* 圖表外層容器保證高度 */
-    .chart-section>div:last-child {
-        min-height: 300px;
-        /* 防止圖表被壓扁 */
-    }
 
     /* ── section 版面縮小 ── */
     .history-section,
