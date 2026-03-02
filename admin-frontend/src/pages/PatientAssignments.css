@@ -226,3 +226,142 @@
     color: #667eea;
     font-weight: 500;
 }
+
+/* ══════════════════════════════════════
+   手機版  < 768px  — 表格 → 卡片
+══════════════════════════════════════ */
+@media (max-width: 767px) {
+
+    /* 標題縮小 */
+    .assignments-header h1 {
+        font-size: 20px;
+    }
+
+    .assignments-header p {
+        font-size: 13px;
+    }
+
+    /* 移除 table 佈局，改成 block */
+    .assignments-table,
+    .assignments-table tbody,
+    .assignments-table tr,
+    .assignments-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* 隱藏橫向表頭 */
+    .assignments-table thead {
+        display: none;
+    }
+
+    /* 每一 tr = 一張卡片 */
+    .assignments-table tbody tr {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+    }
+
+    .assignments-table tbody tr:hover {
+        background: white;
+        /* 取消桌面 hover 背景 */
+    }
+
+    /* 每個 td 重置 padding */
+    .assignments-table td {
+        padding: 4px 0;
+        border-bottom: none;
+        font-size: 14px;
+    }
+
+    /* 用 ::before 偽元素顯示欄位標籤 */
+    .assignments-table td:nth-child(1)::before {
+        content: "姓名：";
+        font-weight: 700;
+        color: #4a5568;
+        margin-right: 4px;
+    }
+
+    .assignments-table td:nth-child(2)::before {
+        content: "郵箱：";
+        font-weight: 700;
+        color: #4a5568;
+        margin-right: 4px;
+    }
+
+    .assignments-table td:nth-child(3)::before {
+        content: "已分配：";
+        font-weight: 700;
+        color: #4a5568;
+        margin-right: 4px;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .assignments-table td:nth-child(4)::before {
+        content: "分配新人員：";
+        font-weight: 700;
+        color: #4a5568;
+        margin-right: 4px;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    /* email 縮小 */
+    .email-cell {
+        font-size: 12px;
+        color: #718096;
+        word-break: break-all;
+    }
+
+    /* 下拉選單與按鈕全寬、縱向 */
+    .assign-controls {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .staff-select {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .assign-btn {
+        width: 100%;
+        font-size: 14px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    /* 醫護人員摘要：單欄 */
+    .staff-list {
+        grid-template-columns: 1fr;
+    }
+
+    .staff-name {
+        font-size: 15px;
+    }
+
+    .staff-email {
+        font-size: 12px;
+    }
+
+    .staff-assignments {
+        font-size: 13px;
+    }
+
+    /* 容器 padding 縮小 */
+    .assignments-container {
+        padding: 12px;
+    }
+
+    .staff-summary {
+        padding: 14px;
+    }
+}
