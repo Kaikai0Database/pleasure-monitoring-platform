@@ -158,17 +158,56 @@ export default function PatientDetail() {
 
     return (
         <div className="patient-detail-container">
-            <div className="detail-header">
-                <button onClick={() => navigate(-1)} className="back-button">
+            <div
+                className="detail-header"
+                style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    justifyContent: 'space-between',
+                }}
+            >
+                <button
+                    onClick={() => navigate(-1)}
+                    className="back-button"
+                    style={{
+                        flex: '1 1 50%',
+                        minWidth: 0,
+                        whiteSpace: 'nowrap',
+                        fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
+                        textAlign: 'center',
+                    }}
+                >
                     ← 返回
                 </button>
-                <div className="header-actions">
+                <div
+                    className="header-actions"
+                    style={{ flex: '1 1 50%', minWidth: 0 }}
+                >
                     {isInWatchlist ? (
-                        <button onClick={handleRemoveFromWatchlist} className="watchlist-button remove">
+                        <button
+                            onClick={handleRemoveFromWatchlist}
+                            className="watchlist-button remove"
+                            style={{
+                                width: '100%',
+                                whiteSpace: 'nowrap',
+                                fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
+                            }}
+                        >
                             ★ 移除特別關注
                         </button>
                     ) : (
-                        <button onClick={handleAddToWatchlist} className="watchlist-button add">
+                        <button
+                            onClick={handleAddToWatchlist}
+                            className="watchlist-button add"
+                            style={{
+                                width: '100%',
+                                whiteSpace: 'nowrap',
+                                fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
+                            }}
+                        >
                             ☆ 添加特別關注
                         </button>
                     )}
