@@ -387,6 +387,25 @@
 
     .pixel-stat-box {
         font-size: 10px;
+        /* 硬性置中，防止 Tailwind 覆蓋 */
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        padding: 8px 2px;
+    }
+
+    .pixel-stat-number {
+        font-size: 20px;
+    }
+
+    /* Player card 手機內不溢出 */
+    .pixel-player-info {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 16px;
     }
 }
 
