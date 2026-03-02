@@ -140,22 +140,27 @@ export const DailyScoreChart: React.FC<DailyScoreChartProps> = ({ history }) => 
                 <>
                     <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
                         <ResponsiveContainer
-                            width={dailyChartData.length > 30 ? dailyChartData.length * 30 : '100%'}
-                            height={300}
+                            width={dailyChartData.length > 30 ? dailyChartData.length * 28 : '100%'}
+                            height={260}
                         >
-                            <LineChart data={dailyChartData}>
+                            <LineChart
+                                data={dailyChartData}
+                                margin={{ top: 5, right: 10, left: 0, bottom: 10 }}
+                            >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis
                                     dataKey="日期"
-                                    label={{ value: '日期', position: 'insideBottom', offset: -5 }}
-                                    angle={-45}
+                                    label={{ value: '日期', position: 'insideBottom', offset: -2 }}
+                                    angle={-35}
                                     textAnchor="end"
-                                    height={80}
+                                    height={55}
+                                    tick={{ fontSize: 11 }}
                                 />
                                 <YAxis
                                     label={{ value: '分數', angle: -90, position: 'insideLeft' }}
                                     ticks={[12, 24, 45]}
                                     domain={[0, 56]}
+                                    width={38}
                                 />
                                 <Tooltip
                                     formatter={(value: any) => value !== null ? value : '無數據'}
@@ -164,7 +169,7 @@ export const DailyScoreChart: React.FC<DailyScoreChartProps> = ({ history }) => 
                                         return dataPoint ? dataPoint.完整日期 : label;
                                     }}
                                 />
-                                <Legend />
+                                <Legend wrapperStyle={{ paddingTop: '4px' }} />
                                 <Line
                                     type="monotone"
                                     dataKey="分數"
