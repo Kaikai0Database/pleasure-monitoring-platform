@@ -352,3 +352,109 @@
         transform: translateY(3px);
     }
 }
+
+/* ══════════════════════════════════════
+   手機版  < 768px
+══════════════════════════════════════ */
+@media (max-width: 767px) {
+
+    /* 標題縮小，下方給呼吸空間 */
+    .page-title {
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
+
+    /* page-header 縱向排列 */
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    /* 下拉選單全寬 */
+    .group-filter-select {
+        width: 100%;
+        font-size: 14px;
+        min-width: unset;
+    }
+
+    /* 個案列表卡片：縱向堆疊 */
+    .patient-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px;
+        transform: none !important;
+    }
+
+    .patient-row:hover {
+        transform: none !important;
+    }
+
+    .patient-info-section {
+        width: 100%;
+    }
+
+    .patient-name-text {
+        font-size: 16px;
+        white-space: normal;
+        flex-wrap: wrap;
+    }
+
+    .patient-email-text {
+        font-size: 12px;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+
+    .patient-score-section {
+        margin: 0;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .score-label {
+        font-size: 13px;
+    }
+
+    .score-text {
+        font-size: 15px;
+    }
+
+    .no-assessment {
+        font-size: 13px;
+    }
+
+    .patient-actions {
+        width: 100%;
+    }
+
+    /* 移除關注按鈕全寬 */
+    .watchlist-remove-btn {
+        width: 100%;
+        border-radius: 6px;
+        height: 36px;
+    }
+
+    /* 空狀態縮小 */
+    .empty-state {
+        padding: 40px 16px;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+    }
+
+    .empty-text {
+        font-size: 18px;
+    }
+
+    .empty-hint {
+        font-size: 14px;
+    }
+
+    /* 容器 padding */
+    .watchlist-patients-section {
+        padding: 14px;
+    }
+}
