@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import db, AssessmentHistory, User
 from app.admin_models import PatientAssignment, PatientWatchlist, HealthcareStaff
 from sqlalchemy import desc
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 history_bp = Blueprint('history', __name__)
@@ -15,38 +15,44 @@ def get_history():
     try:
         current_user_id = int(get_jwt_identity())
         
-        # Auto-delete records older than 10 days in trash
+        # 1. 自動清理垃圾桶 (加入 rollback 保護)
         try:
-            from datetime import timedelta
             ten_days_ago = datetime.now() - timedelta(days=10)
             
-            # Find old trash items
+            # 這裡我們用比較保險的過濾方式
             old_trash = AssessmentHistory.query.filter(
                 AssessmentHistory.is_deleted == True,
                 AssessmentHistory.deleted_at < ten_days_ago
             ).all()
             
-            # Delete them permanently
             for item in old_trash:
                 db.session.delete(item)
             
             if old_trash:
                 db.session.commit()
         except Exception as e:
+            db.session.rollback() # 重要：出錯立刻回滾，不影響下面的查詢
             print(f"Auto-cleanup failed: {e}")
 
-        # Get active history (not deleted)
-        histories = AssessmentHistory.query.filter_by(
-            user_id=current_user_id,
-            is_deleted=False
-        ).order_by(AssessmentHistory.completed_at.desc()).all()
-        
-        return jsonify({
-            'success': True,
-            'history': [h.to_dict() for h in histories]
-        }), 200
+        # 2. 獲取正常歷史紀錄
+        # 加上 try-except 以防止 is_deleted 類型衝突導致 Transaction Aborted
+        try:
+            histories = AssessmentHistory.query.filter_by(
+                user_id=current_user_id,
+                is_deleted=False
+            ).order_by(AssessmentHistory.completed_at.desc()).all()
+            
+            return jsonify({
+                'success': True,
+                'history': [h.to_dict() for h in histories]
+            }), 200
+        except Exception as inner_e:
+            db.session.rollback() # 如果這裡失敗，也必須回滾
+            print(f"Database query failed: {inner_e}")
+            return jsonify({'success': False, 'message': '資料庫讀取異常'}), 500
         
     except Exception as e:
+        db.session.rollback()
         return jsonify({'success': False, 'message': f'獲取歷史記錄失敗: {str(e)}'}), 500
 
 
@@ -57,7 +63,6 @@ def get_trash():
     try:
         current_user_id = int(get_jwt_identity())
         
-        # Get deleted history
         trash_items = AssessmentHistory.query.filter_by(
             user_id=current_user_id,
             is_deleted=True
@@ -69,6 +74,7 @@ def get_trash():
         }), 200
         
     except Exception as e:
+        db.session.rollback() # 確保出錯時清理連線
         return jsonify({'success': False, 'message': f'獲取回收桶失敗: {str(e)}'}), 500
 
 
@@ -80,25 +86,19 @@ def save_history():
         current_user_id = int(get_jwt_identity())
         data = request.get_json()
         
-        # Validate input
         if not data or not all(key in data for key in ['total_score', 'max_score', 'answers']):
             return jsonify({'success': False, 'message': '缺少必要欄位'}), 400
         
-        # Get user to determine group
         user = User.query.get(current_user_id)
         if not user:
             return jsonify({'success': False, 'message': '找不到用戶'}), 404
         
-        # Determine level based on user group
         total_score = data['total_score']
         if user.group == 'student':
-            # Student group: threshold is 23
             level = '需要關注' if total_score >= 23 else '良好'
         else:
-            # Clinical group: threshold is 30
             level = '需要關注' if total_score >= 30 else '良好'
         
-        # Create new history record
         new_history = AssessmentHistory(
             user_id=current_user_id,
             total_score=total_score,
@@ -111,44 +111,29 @@ def save_history():
         db.session.add(new_history)
         db.session.commit()
         
-        # --- Auto-Watchlist Logic ---
-        # Check thresholds: Student >= 23, Clinical >= 30
-        threshold_met = False
-        if user.group == 'student' and total_score >= 23:
-            threshold_met = True
-        elif user.group == 'clinical' and total_score >= 30:
-            threshold_met = True
-            
-        if threshold_met:
-            try:
-                # Find target staff to notify
-                target_staff_ids = []
+        # --- 自動關注邏輯 (加入保護) ---
+        try:
+            threshold_met = False
+            if user.group == 'student' and total_score >= 23:
+                threshold_met = True
+            elif user.group == 'clinical' and total_score >= 30:
+                threshold_met = True
                 
-                # 1. Check assigned staff
+            if threshold_met:
+                target_staff_ids = []
                 assignments = PatientAssignment.query.filter_by(patient_id=current_user_id).all()
                 if assignments:
                     target_staff_ids = [a.staff_id for a in assignments]
                 
-                # 2. If no assignments, fallback to Super Admin
                 if not target_staff_ids:
                     super_admin = HealthcareStaff.query.filter_by(role='super_admin').first()
                     if super_admin:
                         target_staff_ids.append(super_admin.id)
                 
-                # 3. Add to watchlist for each target staff
                 for staff_id in target_staff_ids:
-                    # Check if already in watchlist
-                    exists = PatientWatchlist.query.filter_by(
-                        staff_id=staff_id,
-                        patient_id=current_user_id
-                    ).first()
-                    
+                    exists = PatientWatchlist.query.filter_by(staff_id=staff_id, patient_id=current_user_id).first()
                     if not exists:
-                        # Get max display order
-                        max_order = db.session.query(
-                            db.func.max(PatientWatchlist.display_order)
-                        ).filter_by(staff_id=staff_id).scalar() or 0
-                        
+                        max_order = db.session.query(db.func.max(PatientWatchlist.display_order)).filter_by(staff_id=staff_id).scalar() or 0
                         new_watchlist = PatientWatchlist(
                             staff_id=staff_id,
                             patient_id=current_user_id,
@@ -156,29 +141,31 @@ def save_history():
                             display_order=max_order + 1
                         )
                         db.session.add(new_watchlist)
-                        print(f"Auto-added user {current_user_id} to staff {staff_id} watchlist due to high score {total_score}")
-                
                 db.session.commit()
-            except Exception as w_err:
-                print(f"Auto-watchlist failed: {w_err}")
-                # Don't fail the request, just log error
-        # ----------------------------
-        
-        # Check and create alerts if needed (both high and low score alerts)
+        except Exception as w_err:
+            db.session.rollback() # 自動關注失敗不應影響主流程
+            print(f"Auto-watchlist failed: {w_err}")
+
+        # --- 提醒通知邏輯 (加入強壯日期保護) ---
         try:
             from app.utils.alert_utils import check_and_create_alert
-            alerts = check_and_create_alert(current_user_id, new_history.completed_at.date())
+            # 確保傳入的是 date 物件，避開類型衝突
+            test_date = new_history.completed_at
+            if hasattr(test_date, 'date'):
+                test_date = test_date.date()
+            
+            alerts = check_and_create_alert(current_user_id, test_date)
             if alerts:
                 for alert in alerts:
-                    print(f"{alert.alert_type.upper()} alert created for user {current_user_id} on {alert.alert_date}")
+                    print(f"Alert created for user {current_user_id}")
         except Exception as alert_error:
+            db.session.rollback() # 提醒失敗也要重設連線
             print(f"Alert check failed: {alert_error}")
-            # Don't fail the main request if alert check fails
         
         return jsonify({
             'success': True,
             'history_id': new_history.id,
-            'level': level,  # Return the calculated level
+            'level': level,
             'message': '評估結果已保存'
         }), 201
         
@@ -197,33 +184,24 @@ def delete_history(history_id):
         delete_reason = data.get('reason', '未指定原因')
         permanent = data.get('permanent', False)
         
-        # Find history record
         history = AssessmentHistory.query.get(history_id)
-        
         if not history:
             return jsonify({'success': False, 'message': '記錄不存在'}), 404
         
-        # Check permission
         if history.user_id != current_user_id:
             return jsonify({'success': False, 'message': '無權限刪除此記錄'}), 403
         
         if permanent:
-            # Permanent delete (for restoring from trash or emptying trash)
             db.session.delete(history)
             message = '記錄已永久刪除'
         else:
-            # Soft delete
             history.is_deleted = True
             history.deleted_at = datetime.now()
             history.delete_reason = delete_reason
             message = '記錄已移至回收桶'
         
         db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': message
-        }), 200
+        return jsonify({'success': True, 'message': message}), 200
         
     except Exception as e:
         db.session.rollback()
@@ -236,14 +214,11 @@ def restore_history(history_id):
     """Restore a deleted history record"""
     try:
         current_user_id = int(get_jwt_identity())
-        
-        # Find history record
         history = AssessmentHistory.query.get(history_id)
         
         if not history:
             return jsonify({'success': False, 'message': '記錄不存在'}), 404
         
-        # Check permission
         if history.user_id != current_user_id:
             return jsonify({'success': False, 'message': '無權限操作此記錄'}), 403
             
@@ -251,23 +226,14 @@ def restore_history(history_id):
         history.deleted_at = None
         history.delete_reason = None
         
-        # Get user to determine group threshold
         user = User.query.get(current_user_id)
-        
-        # Recalculate level based on total score and user group upon restoration
         if user and user.group == 'student':
-            # Student group: threshold is 23
             history.level = '需要關注' if history.total_score >= 23 else '良好'
         else:
-            # Clinical group: threshold is 30
             history.level = '需要關注' if history.total_score >= 30 else '良好'
         
         db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': '記錄已還原'
-        }), 200
+        return jsonify({'success': True, 'message': '記錄已還原'}), 200
         
     except Exception as e:
         db.session.rollback()
