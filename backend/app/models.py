@@ -137,23 +137,30 @@ class AssessmentHistory(db.Model):
     delete_reason = db.Column(db.String(255), nullable=True)
     
     def to_dict(self):
-        """Convert assessment history to dictionary"""
+        """Convert assessment history to dictionary - 安全防護版"""
+        # 1. 這裡維持原樣，這是算進度條用的
         percentage = round((self.total_score / self.max_score) * 100) if self.max_score > 0 else 0
         
-        # Safe JSON parsing
-        try:
-            answers_data = json.loads(self.answers) if self.answers else []
-        except (json.JSONDecodeError, ValueError, TypeError) as e:
-            print(f"[WARNING] Invalid JSON in assessment {self.id} answers field: {e}")
+        # 2. 【核心修正】：判斷 answers 的類型
+        answers_data = self.answers
+        if isinstance(answers_data, str):  # 只有當它是「字串」時，才需要 json.loads
+            try:
+                import json
+                answers_data = json.loads(answers_data)
+            except:
+                answers_data = []
+        elif answers_data is None:
             answers_data = []
-        
+        # 如果 answers_data 本來就是 list，它會直接跳過上面的判斷，平安抵達 return
+
+        # 3. 變數一個都不能少！全部回傳給前端
         return {
             'id': self.id,
             'total_score': self.total_score,
             'max_score': self.max_score,
             'level': self.level,
             'percentage': percentage,
-            'answers': answers_data,
+            'answers': answers_data, # 使用處理完的資料
             'completed_at': str(self.completed_at) if self.completed_at else None,
             'is_deleted': bool(self.is_deleted),
             'deleted_at': str(self.deleted_at) if self.deleted_at else None,
@@ -213,14 +220,28 @@ class ScoreAlert(db.Model):
     user = db.relationship('User', backref='score_alerts')
     
     def to_dict(self):
-        """Convert alert to dictionary"""
+        """Convert score alert to dictionary - 同樣加上 JSON 安全防護"""
+        import json
+        
+        # 1. 處理 exceeded_lines 的類型衝突
+        lines_data = self.exceeded_lines
+        if isinstance(lines_data, str): # 如果從資料庫出來是字串（如 SQLite）
+            try:
+                lines_data = json.loads(lines_data)
+            except:
+                lines_data = {}
+        elif lines_data is None:
+            lines_data = {}
+        # 如果已經是 dict，則直接使用
+
         return {
             'id': self.id,
             'user_id': self.user_id,
             'alert_date': str(self.alert_date) if self.alert_date else None,
-            'daily_average': self.daily_average,
-            'exceeded_lines': json.loads(self.exceeded_lines) if self.exceeded_lines else [],
+            'daily_average': float(self.daily_average) if self.daily_average else 0,
+            'score_alerts_alert_type': self.alert_type, # 確保與前端對接的 key 一致
             'alert_type': self.alert_type,
-            'is_read': self.is_read,
+            'exceeded_lines': lines_data, # 這裡現在保證是字典格式了
+            'is_read': bool(self.is_read) if hasattr(self, 'is_read') else False,
             'created_at': str(self.created_at) if self.created_at else None
         }
