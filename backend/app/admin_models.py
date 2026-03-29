@@ -16,13 +16,15 @@ class HealthcareStaff(db.Model):
     watchlist_items = db.relationship('PatientWatchlist', backref='staff', lazy=True, cascade='all, delete-orphan')
     
     def to_dict(self):
-        """Convert staff to dictionary"""
+        """Convert healthcare staff to dictionary - Safe version"""
         return {
             'id': self.id,
             'email': self.email,
             'name': self.name,
             'role': self.role,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            # 修正點：使用 str() 避開 .isoformat() 的類型衝突
+            'created_at': str(self.created_at) if self.created_at else None,
+            'last_login': str(self.last_login) if hasattr(self, 'last_login') and self.last_login else None
         }
 
 
@@ -44,15 +46,15 @@ class PatientWatchlist(db.Model):
     )
     
     def to_dict(self):
-        """Convert watchlist item to dictionary"""
+        """Convert assignment to dictionary"""
         return {
             'id': self.id,
             'staff_id': self.staff_id,
             'patient_id': self.patient_id,
-            'notes': self.notes,
-            'display_order': self.display_order,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'assigned_at': str(self.assigned_at) if self.assigned_at else None,
+            # 如果有關聯對象，也一併回傳
+            'patient_name': self.patient.name if hasattr(self, 'patient') and self.patient else None,
+            'staff_name': self.staff.name if hasattr(self, 'staff') and self.staff else None
         }
 
 
@@ -73,13 +75,15 @@ class PatientAssignment(db.Model):
     )
     
     def to_dict(self):
-        """Convert assignment to dictionary"""
+        """Convert watchlist item to dictionary"""
         return {
             'id': self.id,
             'staff_id': self.staff_id,
             'patient_id': self.patient_id,
-            'assigned_by': self.assigned_by,
-            'assigned_at': self.assigned_at.isoformat() if self.assigned_at else None,
-            'notes': self.notes
+            'notes': self.notes,
+            'display_order': self.display_order,
+            'added_at': str(self.added_at) if hasattr(self, 'added_at') and self.added_at else None,
+            # 確保布林值正確傳遞
+            'is_active': bool(self.is_active) if hasattr(self, 'is_active') else True
         }
 
