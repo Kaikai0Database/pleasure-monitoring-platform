@@ -62,18 +62,20 @@ def login():
             return jsonify({'success': False, 'message': '電子郵件或密碼錯誤'}), 401
         
         # Update login stats
-        try:
-            from datetime import datetime
-            today = datetime.now().date()
-            if user.last_login_date != today:
+         try:
+            from datetime import datetime, date
+            today_str = datetime.now().strftime('%Y-%m-%d')
+            if last_login_str[:10] != today_str:
                 user.daily_login_count = 1
-                user.last_login_date = today
+                user.last_login_date = datetime.now() # 存入完整的日期時間物件
             else:
                 user.daily_login_count = (user.daily_login_count or 0) + 1
+    
             db.session.commit()
         except Exception as e:
+            db.session.rollback() # 出錯時回滾，避免影響後續操作
             print(f"Failed to update login stats: {e}")
-            # Don't fail login if stats fail
+                # Don't fail login if stats fail
 
         # Create JWT token - identity must be a string
         access_token = create_access_token(identity=str(user.id))
