@@ -6,37 +6,35 @@ from app.models import db
 import os
 
 def create_app(config_name='default'):
-    """Application factory pattern"""
     app = Flask(__name__, instance_relative_config=True)
-    
-    # Load configuration
     app.config.from_object(config[config_name])
     
-    #允許所有標頭通行，特別加入 ngrok 標頭
-    CORS(app, supports_credentials=True, resources={
-        r"/api/*": {
-            "origins": "*",
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization", "ngrok-skip-browser-warning"]
-        }
-    })
+    # 1. CORS：直接允許所有標頭 (萬用字元)
+    # 注意：如果 supports_credentials=True，origins 不能用 "*"
+    CORS(app, supports_credentials=True)
 
     db.init_app(app)
     jwt = JWTManager(app)
     
-    #手動反射來源網址 + 准許 ngrok 標頭
+    # 2. 強力補強：手動反射任何請求過來的 Header
     @app.after_request
     def add_cors_headers(response):
         origin = request.headers.get('Origin')
         if origin:
             response.headers['Access-Control-Allow-Origin'] = origin
-            
+        
         response.headers['Access-Control-Allow-Credentials'] = 'true'
-        # 關鍵修正：這裡也要手動加入 ngrok-skip-browser-warning
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, ngrok-skip-browser-warning'
+        
+        # 關鍵：這裡把請求中所有的 Header 都准許通行
+        allow_headers = request.headers.get('Access-Control-Request-Headers')
+        if allow_headers:
+            response.headers['Access-Control-Allow-Headers'] = allow_headers
+        else:
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, ngrok-skip-browser-warning'
+            
         response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE, OPTIONS'
         
-        # ngrok 專用標頭
+        # 額外補上 ngrok 專用通行證
         response.headers['ngrok-skip-browser-warning'] = 'true'
         return response
     
