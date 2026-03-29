@@ -87,18 +87,28 @@ class User(db.Model):
         if not self.histories:
             return 0
             
-        # Get unique dates
-        dates = sorted(list(set([h.completed_at.date() for h in self.histories])), reverse=True)
+        from datetime import datetime, date
+        temp_dates = []
+        for h in self.histories:
+            val = h.completed_at
+            if not val: continue
+            
+            # 如果是字串，轉成 date 物件
+            if isinstance(val, str):
+                try:
+                    temp_dates.append(datetime.strptime(val[:10], '%Y-%m-%d').date())
+                except: continue
+            # 如果已經是日期物件，直接取 date()
+            elif hasattr(val, 'date'):
+                temp_dates.append(val.date())
+                
+        dates = sorted(list(set(temp_dates)), reverse=True)
         if not dates:
             return 0
             
-        from datetime import datetime
         today = datetime.now().date()
         
-        # If no assessment today or yesterday, streak is broken (or 0 if strictly consecutive ending recently)
-        # But if they login today, and last test was yesterday, is streak active? 
-        # Usually streak allows 1 day gap (today not done yet).
-        # Check if most recent is today or yesterday
+        # 檢查最近一次測試是否在今天或昨天
         if (today - dates[0]).days > 1:
             return 0
             
@@ -176,13 +186,13 @@ class Diary(db.Model):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'date': self.date.isoformat() if self.date else None,
+            'date': str(self.date) if self.date else None,
             'mood': self.mood,
             'content': self.content,
             'images': json.loads(self.images) if self.images else [],
             'period_marker': self.period_marker,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'created_at': str(self.created_at) if self.created_at else None,
+            'updated_at': str(self.updated_at) if self.updated_at else None
         }
 
 
@@ -207,10 +217,10 @@ class ScoreAlert(db.Model):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'alert_date': self.alert_date.strftime('%Y-%m-%d') if self.alert_date else None,
+            'alert_date': str(self.alert_date) if self.alert_date else None,
             'daily_average': self.daily_average,
             'exceeded_lines': json.loads(self.exceeded_lines) if self.exceeded_lines else [],
             'alert_type': self.alert_type,
             'is_read': self.is_read,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None
+            'created_at': str(self.created_at) if self.created_at else None
         }
