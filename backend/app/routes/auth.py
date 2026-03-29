@@ -63,21 +63,20 @@ def login():
         
         # Update login stats
         try:
-            from datetime import datetime, date
+            from datetime import datetime
             today_str = datetime.now().strftime('%Y-%m-%d')
             last_login_str = str(user.last_login_date) if user.last_login_date else ""
     
             if last_login_str[:10] != today_str:
                 user.daily_login_count = 1
-                user.last_login_date = datetime.now()  # 存入完整的日期時間物件
+                user.last_login_date = datetime.now()
             else:
                 user.daily_login_count = (user.daily_login_count or 0) + 1
     
             db.session.commit()
         except Exception as e:
-            db.session.rollback()  # 出錯時回滾，避免影響後續操作
-            print(f"Failed to update login stats: {e}")
-            # Don't fail login if stats fail
+            db.session.rollback()
+            print(f"DEBUG: Login stats update failed: {e}")
 
         # Create JWT token - identity must be a string
         access_token = create_access_token(identity=str(user.id))
