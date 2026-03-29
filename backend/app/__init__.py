@@ -12,14 +12,19 @@ def create_app(config_name='default'):
     # Load configuration
     app.config.from_object(config[config_name])
     
-    #CORS 設定
-    # 這裡我們不寫 "*"，讓它保持彈性
-    CORS(app, supports_credentials=True)
+    #允許所有標頭通行，特別加入 ngrok 標頭
+    CORS(app, supports_credentials=True, resources={
+        r"/api/*": {
+            "origins": "*",
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization", "ngrok-skip-browser-warning"]
+        }
+    })
 
     db.init_app(app)
     jwt = JWTManager(app)
     
-    # 解決 credentials + dynamic origin 的關鍵
+    #手動反射來源網址 + 准許 ngrok 標頭
     @app.after_request
     def add_cors_headers(response):
         origin = request.headers.get('Origin')
@@ -27,32 +32,15 @@ def create_app(config_name='default'):
             response.headers['Access-Control-Allow-Origin'] = origin
             
         response.headers['Access-Control-Allow-Credentials'] = 'true'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
-        response.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
+        # 關鍵修正：這裡也要手動加入 ngrok-skip-browser-warning
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, ngrok-skip-browser-warning'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE, OPTIONS'
         
-        # 原有的其他 Header
+        # ngrok 專用標頭
         response.headers['ngrok-skip-browser-warning'] = 'true'
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
         return response
     
-    # JWT error handlers
-    @jwt.invalid_token_loader
-    def invalid_token_callback(error_string):
-        return jsonify({'success': False, 'message': '無效的token'}), 401
-    
-    @jwt.unauthorized_loader
-    def unauthorized_callback(error_string):
-        return jsonify({'success': False, 'message': '缺少Authorization header'}), 401
-    
-    @jwt.expired_token_loader
-    def expired_token_callback(jwt_header, jwt_payload):
-        return jsonify({'success': False, 'message': 'Token已過期，請重新登入'}), 401
-    
-    @jwt.revoked_token_loader
-    def revoked_token_callback(jwt_header, jwt_payload):
-        return jsonify({'success': False, 'message': 'Token已被撤銷'}), 401
-    
-    # Register blueprints
+    # --- 以下 Blueprint 註冊邏輯維持原樣 ---
     from app.routes.auth import auth_bp
     from app.routes.history import history_bp
     from app.routes.diary import diary_bp
