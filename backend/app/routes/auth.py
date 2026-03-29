@@ -65,9 +65,9 @@ def login():
         try:
             from datetime import datetime
             today_str = datetime.now().strftime('%Y-%m-%d')
-            last_login_str = str(user.last_login_date) if user.last_login_date else ""
+            db_date_str = str(user.last_login_date)[:10] if user.last_login_date else ""
     
-            if last_login_str[:10] != today_str:
+            if db_date_str != today_str:
                 user.daily_login_count = 1
                 user.last_login_date = datetime.now()
             else:
@@ -76,7 +76,7 @@ def login():
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            print(f"DEBUG: Login stats update failed: {e}")
+            print(f"DEBUG: Login stats update skipped due to: {e}")
 
         # Create JWT token - identity must be a string
         access_token = create_access_token(identity=str(user.id))
