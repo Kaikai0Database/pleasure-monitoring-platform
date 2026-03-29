@@ -17,13 +17,13 @@ def create_app(config_name='default'):
     if "," in origins:
         origins = [o.strip() for o in origins.split(",")]
     
-    CORS(app, resources={
-        r"/*": {
-            "origins": origins,
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization", "ngrok-skip-browser-warning"]
-        }
-    })
+    CORS(app, supports_credentials=True, resources={
+    r"/api/": {
+        "origins": "",  # 允許所有來源，這樣不管前端網址怎麼變都沒事
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 
     db.init_app(app)  # ← 必要：將 db 和 Flask app 連結
     jwt = JWTManager(app)
