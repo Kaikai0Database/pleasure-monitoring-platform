@@ -73,7 +73,12 @@ def login():
         return jsonify({
             'success': True,
             'access_token': access_token,
-            'staff': staff.to_dict()
+            'staff': {
+                'id': staff.id,
+                'name': staff.name,
+                'role': staff.role,
+                'email': staff.email
+            }
         }), 200
         
     except Exception as e:
