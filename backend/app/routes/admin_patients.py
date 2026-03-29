@@ -19,20 +19,15 @@ def verify_admin():
 @admin_patients_bp.route('', methods=['GET'])
 @jwt_required()
 def get_patients():
-    # 核心修正 1：進入前絕對重設，防止 Transaction 堵塞
-    db.session.rollback()
-    
+    db.session.rollback() # 一進來先重設
     try:
         staff_id = verify_admin()
-        if not staff_id:
-            return jsonify({'success': False, 'message': '無效的管理員權限'}), 403
+        if not staff_id: return jsonify({'success': False, 'message': '權限不足'}), 403
         
         from app.admin_models import HealthcareStaff, PatientWatchlist, PatientAssignment
         staff = HealthcareStaff.query.get(staff_id)
-        if not staff:
-            return jsonify({'success': False, 'message': '找不到管理員'}), 403
         
-        # 核心修正 2：簡化過濾邏輯，減少查詢壓力
+        # 1. 一次性抓出所有權限內的病人
         if staff.role == 'super_admin':
             patients = User.query.all()
         else:
@@ -40,45 +35,48 @@ def get_patients():
             p_ids = [a.patient_id for a in assignments]
             if not p_ids: return jsonify({'success': True, 'patients': []}), 200
             patients = User.query.filter(User.id.in_(p_ids)).all()
-        
+
+        # 2. 獲取所有人的最新評估 (減少迴圈內壓力)
+        # 我們只取必要的欄位
         result = []
         today = datetime.now().date()
-        
-        for patient in patients:
-            # 我們這裡先不做太複雜的運算，防止 502 超時
-            # 獲取最新評估，改用較輕量的查詢
-            latest = AssessmentHistory.query.filter_by(user_id=patient.id, is_deleted=False)\
-                    .order_by(desc(AssessmentHistory.completed_at)).first()
-            
-            # 安全處理日期計算
-            last_login = patient.last_login_date
-            inactive = False
-            if last_login:
-                if isinstance(last_login, str):
-                    try: last_login = datetime.strptime(last_login[:10], '%Y-%m-%d').date()
-                    except: last_login = None
-                if last_login and (today - last_login).days >= 5: inactive = True
-            else: inactive = True
 
-            # 封裝資料
-            p_dict = {
-                'id': patient.id,
-                'name': patient.name,
-                'email': patient.email,
-                'group': patient.group,
-                'inactive_warning': inactive,
-                'latest_assessment': latest.to_dict() if latest else None,
-                'is_in_watchlist': PatientWatchlist.query.filter_by(staff_id=staff_id, patient_id=patient.id).first() is not None
-            }
-            result.append(p_dict)
+        for patient in patients:
+            try:
+                # 這裡只抓最核心的資料
+                latest = AssessmentHistory.query.filter_by(user_id=patient.id, is_deleted=False)\
+                         .order_by(desc(AssessmentHistory.completed_at)).first()
+                
+                # 計算未登入天數 (防禦性寫法)
+                last_login = patient.last_login_date
+                inactive = False
+                if last_login:
+                    if isinstance(last_login, str):
+                        try: last_login = datetime.strptime(last_login[:10], '%Y-%m-%d').date()
+                        except: last_login = None
+                    if last_login and (today - last_login).days >= 5:
+                        inactive = True
+                else: inactive = True
+
+                # 組裝資料，如果 patient.to_dict() 壞了，我們手動組
+                p_data = {
+                    'id': patient.id,
+                    'name': patient.name,
+                    'email': patient.email,
+                    'group': patient.group,
+                    'inactive_warning': inactive,
+                    'latest_assessment': latest.to_dict() if latest else None,
+                    'is_in_watchlist': PatientWatchlist.query.filter_by(staff_id=staff_id, patient_id=patient.id).first() is not None
+                }
+                result.append(p_data)
+            except Exception as item_err:
+                print(f"跳過錯誤個案 {patient.id}: {item_err}")
+                continue # 某個病人資料壞了不要卡住整頁
             
         return jsonify({'success': True, 'patients': result}), 200
-        
     except Exception as e:
         db.session.rollback()
-        # 這裡的 print 會出現在 Render Logs，非常重要
-        print(f"CRITICAL ERROR in get_patients: {str(e)}")
-        return jsonify({'success': False, 'message': '後端處理超時或崩潰'}), 500
+        return jsonify({'success': False, 'message': '伺服器繁忙，請稍後再試'}), 500
 
 
 @admin_patients_bp.route('/<int:patient_id>', methods=['GET'])
