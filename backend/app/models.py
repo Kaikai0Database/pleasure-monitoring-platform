@@ -144,9 +144,9 @@ class AssessmentHistory(db.Model):
             'level': self.level,
             'percentage': percentage,
             'answers': answers_data,
-            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+            'completed_at':  str(self.completed_at) if self.completed_at else None,
             'is_deleted': self.is_deleted,
-            'deleted_at': self.deleted_at.isoformat() if self.deleted_at else None,
+            'deleted_at': str(self.deleted_at) if self.deleted_at else None,
             'delete_reason': self.delete_reason
         }
 
