@@ -1,15 +1,13 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import db, User, AssessmentHistory
-from sqlalchemy import func, desc, cast, Date
+from sqlalchemy import func, desc
 from datetime import datetime, timedelta
 import json
 
 admin_patients_bp = Blueprint('admin_patients', __name__)
 
-
 def verify_admin():
-    """Helper function to verify admin token"""
     identity = get_jwt_identity()
     if not (identity and str(identity).startswith('admin_')):
         return None
@@ -18,12 +16,10 @@ def verify_admin():
     except:
         return None
 
-
 @admin_patients_bp.route('', methods=['GET'])
 @jwt_required()
 def get_patients():
-    """Get all patients with their latest assessment info"""
-    # 核心修正：進入前先重設連線，清除可能卡住的 Transaction Error
+    # 核心修正 1：進入前絕對重設，防止 Transaction 堵塞
     db.session.rollback()
     
     try:
@@ -33,80 +29,56 @@ def get_patients():
         
         from app.admin_models import HealthcareStaff, PatientWatchlist, PatientAssignment
         staff = HealthcareStaff.query.get(staff_id)
-        
         if not staff:
-            return jsonify({'success': False, 'message': '找不到管理員資料'}), 403
+            return jsonify({'success': False, 'message': '找不到管理員'}), 403
         
+        # 核心修正 2：簡化過濾邏輯，減少查詢壓力
         if staff.role == 'super_admin':
             patients = User.query.all()
         else:
             assignments = PatientAssignment.query.filter_by(staff_id=staff_id).all()
-            patient_ids = [a.patient_id for a in assignments]
-            
-            if not patient_ids:
-                return jsonify({'success': True, 'patients': []}), 200
-            
-            patients = User.query.filter(User.id.in_(patient_ids)).all()
+            p_ids = [a.patient_id for a in assignments]
+            if not p_ids: return jsonify({'success': True, 'patients': []}), 200
+            patients = User.query.filter(User.id.in_(p_ids)).all()
         
         result = []
         today = datetime.now().date()
         
         for patient in patients:
-            # 獲取最新評估與統計 (使用 filter)
-            latest_assessment = AssessmentHistory.query.filter_by(
-                user_id=patient.id, is_deleted=False
-            ).order_by(desc(AssessmentHistory.completed_at)).first()
+            # 我們這裡先不做太複雜的運算，防止 502 超時
+            # 獲取最新評估，改用較輕量的查詢
+            latest = AssessmentHistory.query.filter_by(user_id=patient.id, is_deleted=False)\
+                    .order_by(desc(AssessmentHistory.completed_at)).first()
             
-            total_assessments = AssessmentHistory.query.filter_by(
-                user_id=patient.id, is_deleted=False
-            ).count()
-            
-            avg_score = db.session.query(func.avg(AssessmentHistory.total_score)).filter_by(
-                user_id=patient.id, is_deleted=False
-            ).scalar()
-            
-            patient_data = patient.to_dict()
-            patient_data['latest_assessment'] = latest_assessment.to_dict() if latest_assessment else None
-            patient_data['total_assessments'] = total_assessments
-            patient_data['average_score'] = round(float(avg_score), 2) if avg_score else None
-            
-            # --- 核心修正：安全計算未登入天數 ---
-            inactive_warning = False
+            # 安全處理日期計算
             last_login = patient.last_login_date
-            
+            inactive = False
             if last_login:
-                # 如果是字串格式，手動轉換為 date 物件
                 if isinstance(last_login, str):
-                    try:
-                        last_login = datetime.strptime(last_login[:10], '%Y-%m-%d').date()
-                    except:
-                        last_login = None
-                
-                # 只有在成功取得日期物件後才進行減法
-                if last_login and hasattr(last_login, 'year'):
-                    days_since_login = (today - last_login).days
-                    if days_since_login >= 5:
-                        inactive_warning = True
-                else:
-                    inactive_warning = True
-            else:
-                inactive_warning = True
+                    try: last_login = datetime.strptime(last_login[:10], '%Y-%m-%d').date()
+                    except: last_login = None
+                if last_login and (today - last_login).days >= 5: inactive = True
+            else: inactive = True
+
+            # 封裝資料
+            p_dict = {
+                'id': patient.id,
+                'name': patient.name,
+                'email': patient.email,
+                'group': patient.group,
+                'inactive_warning': inactive,
+                'latest_assessment': latest.to_dict() if latest else None,
+                'is_in_watchlist': PatientWatchlist.query.filter_by(staff_id=staff_id, patient_id=patient.id).first() is not None
+            }
+            result.append(p_dict)
             
-            patient_data['inactive_warning'] = inactive_warning
-            
-            # 檢查追蹤名單
-            is_in_watchlist = PatientWatchlist.query.filter_by(
-                staff_id=staff_id, patient_id=patient.id
-            ).first() is not None
-            
-            patient_data['is_in_watchlist'] = is_in_watchlist
-            result.append(patient_data)
-        
         return jsonify({'success': True, 'patients': result}), 200
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'message': f'獲取病人列表失敗: {str(e)}'}), 500
+        # 這裡的 print 會出現在 Render Logs，非常重要
+        print(f"CRITICAL ERROR in get_patients: {str(e)}")
+        return jsonify({'success': False, 'message': '後端處理超時或崩潰'}), 500
 
 
 @admin_patients_bp.route('/<int:patient_id>', methods=['GET'])
