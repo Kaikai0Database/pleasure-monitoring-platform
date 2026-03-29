@@ -84,19 +84,22 @@ def get_patients():
 def get_patient_detail(patient_id):
     db.session.rollback()
     try:
-        # 直接查詢，並確保使用安全轉換
-        patient = User.query.get(patient_id)
+        # 修正：直接從 User 表查，不要加太多複雜的關聯
+        patient = User.query.filter_by(id=patient_id).first()
         if not patient:
-            return jsonify({'success': False, 'message': '找不到此個案資料'}), 404
-            
+            # 如果真的查不到，日誌會顯示 ID
+            print(f"❌ 查無此個案 ID: {patient_id}")
+            return jsonify({'success': False, 'message': '個案不存在'}), 404
+        
+        # 使用我們修正後的安全 to_dict
         return jsonify({
             'success': True,
             'patient': patient.to_dict()
         }), 200
     except Exception as e:
         db.session.rollback()
-        # 如果是 to_dict 崩潰，這裡會抓到
-        return jsonify({'success': False, 'message': f'讀取內容失敗: {str(e)}'}), 500
+        print(f"🔥 讀取詳情崩潰: {str(e)}")
+        return jsonify({'success': False, 'message': '讀取失敗'}), 500
 
 
 @admin_patients_bp.route('/<int:patient_id>/statistics', methods=['GET'])
