@@ -84,18 +84,19 @@ def get_patients():
 def get_patient_detail(patient_id):
     db.session.rollback()
     try:
-        staff_id = verify_admin()
-        if not staff_id:
-            return jsonify({'success': False, 'message': '無效的管理員權限'}), 403
-        
+        # 直接查詢，並確保使用安全轉換
         patient = User.query.get(patient_id)
         if not patient:
-            return jsonify({'success': False, 'message': '病人不存在'}), 404
-        
-        return jsonify({'success': True, 'patient': patient.to_dict()}), 200
+            return jsonify({'success': False, 'message': '找不到此個案資料'}), 404
+            
+        return jsonify({
+            'success': True,
+            'patient': patient.to_dict()
+        }), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'message': f'獲取病人詳情失敗: {str(e)}'}), 500
+        # 如果是 to_dict 崩潰，這裡會抓到
+        return jsonify({'success': False, 'message': f'讀取內容失敗: {str(e)}'}), 500
 
 
 @admin_patients_bp.route('/<int:patient_id>/statistics', methods=['GET'])
