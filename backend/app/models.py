@@ -55,7 +55,7 @@ class User(db.Model):
             'name': self.name,
             'created_at': str(self.created_at) if self.created_at else None,
             'daily_login_count': self.daily_login_count,
-            'is_profile_completed': self.is_profile_completed,
+            'is_profile_completed': bool(self.is_profile_completed) if self.is_profile_completed is not None else False,
             'nickname': self.nickname,
             'dob':  str(self.dob) if self.dob else None,
             'gender': self.gender,
@@ -64,21 +64,21 @@ class User(db.Model):
             'education': self.education,
             'marital_status': self.marital_status,
             'marriage_other': self.marriage_other,
-            'has_children': self.has_children,
+            'has_children': bool(self.has_children) if self.has_children is not None else False,
             'children_count': self.children_count,
             'economic_status': self.economic_status,
             'family_structure': self.family_structure,
             'family_other': self.family_other,
-            'has_job': self.has_job,
+            'has_job': bool(self.has_job) if self.has_job is not None else False,
             'salary_range': self.salary_range,
             'location_city': self.location_city,
             'location_district': self.location_district,
             'living_situation': self.living_situation,
             'cohabitant_count': self.cohabitant_count,
-            'religion': self.religion,
+            'religion': bool(self.religion) if self.religion is not None else False,
             'religion_other': self.religion_other,
             'group': self.group,
-            'has_consented': self.has_consented,
+            'has_consented': bool(self.has_consented) if self.has_consented is not None else False,
             'consecutive_days': self.calculate_streak()
         }
 
@@ -190,14 +190,23 @@ class Diary(db.Model):
     
     def to_dict(self):
         """Convert diary to dictionary"""
+        images_data = self.images
+        if isinstance(images_data, str):
+            try:
+                images_data = json.loads(images_data)
+            except:
+                images_data = []
+        elif images_data is None:
+            images_data = []
+
         return {
             'id': self.id,
             'user_id': self.user_id,
             'date': str(self.date) if self.date else None,
             'mood': self.mood,
             'content': self.content,
-            'images': json.loads(self.images) if self.images else [],
-            'period_marker': self.period_marker,
+            'images': images_data,
+            'period_marker': bool(self.period_marker) if self.period_marker is not None else False,
             'created_at': str(self.created_at) if self.created_at else None,
             'updated_at': str(self.updated_at) if self.updated_at else None
         }

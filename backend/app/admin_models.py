@@ -46,12 +46,15 @@ class PatientWatchlist(db.Model):
     )
     
     def to_dict(self):
-        """Convert assignment to dictionary"""
+        """Convert watchlist item to dictionary"""
         return {
             'id': self.id,
             'staff_id': self.staff_id,
             'patient_id': self.patient_id,
-            'assigned_at': str(self.assigned_at) if self.assigned_at else None,
+            'notes': self.notes,
+            'display_order': self.display_order,
+            'created_at': str(self.created_at) if self.created_at else None,
+            'updated_at': str(self.updated_at) if self.updated_at else None,
             # 如果有關聯對象，也一併回傳
             'patient_name': self.patient.name if hasattr(self, 'patient') and self.patient else None,
             'staff_name': self.staff.name if hasattr(self, 'staff') and self.staff else None
@@ -75,15 +78,13 @@ class PatientAssignment(db.Model):
     )
     
     def to_dict(self):
-        """Convert watchlist item to dictionary"""
+        """Convert assignment to dictionary"""
         return {
             'id': self.id,
             'staff_id': self.staff_id,
             'patient_id': self.patient_id,
-            'notes': self.notes,
-            'display_order': self.display_order,
-            'added_at': str(self.added_at) if hasattr(self, 'added_at') and self.added_at else None,
-            # 確保布林值正確傳遞
-            'is_active': bool(self.is_active) if hasattr(self, 'is_active') else True
+            'assigned_by': self.assigned_by,
+            'assigned_at': str(self.assigned_at) if self.assigned_at else None,
+            'notes': self.notes
         }
 
