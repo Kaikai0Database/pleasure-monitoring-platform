@@ -63,12 +63,18 @@ export default function PatientDetail() {
 
             // Get latest high and low alerts
             if (alertsRes.data.success && alertsRes.data.alerts && alertsRes.data.alerts.length > 0) {
-                const highAlerts = alertsRes.data.alerts.filter((a: any) => a.alert_type === 'high');
+                // 找出最新的一筆警報日期
+                const latestAlertDate = alertsRes.data.alerts[0].alert_date;
+                
+                // 只過濾出「同一天」的最新警報，避免拿好幾天前的接近警報和今天的穿線警報混搭
+                const currentAlerts = alertsRes.data.alerts.filter((a: any) => a.alert_date === latestAlertDate);
+
+                const highAlerts = currentAlerts.filter((a: any) => a.alert_type === 'high');
                 if (highAlerts.length > 0) {
                     setLatestHighAlert(highAlerts[0]);
                 }
 
-                const lowAlerts = alertsRes.data.alerts.filter((a: any) => a.alert_type === 'low');
+                const lowAlerts = currentAlerts.filter((a: any) => a.alert_type === 'low');
                 if (lowAlerts.length > 0) {
                     setLatestLowAlert(lowAlerts[0]);
                 }
