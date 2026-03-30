@@ -61,22 +61,27 @@ export default function PatientDetail() {
             if (statsRes.data.success) setStatistics(statsRes.data.statistics);
             if (diariesRes.data.success) setDiaries(diariesRes.data.diaries);
 
-            // Get latest high and low alerts
+            // Get latest high and low alerts (Only unread/active ones to match Dashboard)
             if (alertsRes.data.success && alertsRes.data.alerts && alertsRes.data.alerts.length > 0) {
-                // 找出最新的一筆警報日期
-                const latestAlertDate = alertsRes.data.alerts[0].alert_date;
+                // 先只過濾出尚未被標記已讀的活躍警報
+                const unreadAlerts = alertsRes.data.alerts.filter((a: any) => a.is_read === false);
                 
-                // 只過濾出「同一天」的最新警報，避免拿好幾天前的接近警報和今天的穿線警報混搭
-                const currentAlerts = alertsRes.data.alerts.filter((a: any) => a.alert_date === latestAlertDate);
+                if (unreadAlerts.length > 0) {
+                    // 找出最新的一筆活躍警報日期
+                    const latestAlertDate = unreadAlerts[0].alert_date;
+                    
+                    // 只過濾出「同一天」的最新活躍警報
+                    const currentAlerts = unreadAlerts.filter((a: any) => a.alert_date === latestAlertDate);
 
-                const highAlerts = currentAlerts.filter((a: any) => a.alert_type === 'high');
-                if (highAlerts.length > 0) {
-                    setLatestHighAlert(highAlerts[0]);
-                }
+                    const highAlerts = currentAlerts.filter((a: any) => a.alert_type === 'high');
+                    if (highAlerts.length > 0) {
+                        setLatestHighAlert(highAlerts[0]);
+                    }
 
-                const lowAlerts = currentAlerts.filter((a: any) => a.alert_type === 'low');
-                if (lowAlerts.length > 0) {
-                    setLatestLowAlert(lowAlerts[0]);
+                    const lowAlerts = currentAlerts.filter((a: any) => a.alert_type === 'low');
+                    if (lowAlerts.length > 0) {
+                        setLatestLowAlert(lowAlerts[0]);
+                    }
                 }
             }
         } catch (err: any) {
