@@ -20,6 +20,7 @@ def verify_admin():
 @jwt_required()
 def get_assignments():
     """Get all assignments (super_admin) or own assignments (nurse)"""
+    db.session.rollback()
     try:
         staff = verify_admin()
         if not staff:
@@ -33,10 +34,16 @@ def get_assignments():
             assignments = PatientAssignment.query.filter_by(staff_id=staff.id).all()
         
         # Get patient and staff info for each assignment
+        p_ids = [a.patient_id for a in assignments]
+        s_ids = [a.staff_id for a in assignments]
+        
+        patients_map = {p.id: p for p in User.query.filter(User.id.in_(p_ids)).all()} if p_ids else {}
+        staff_map = {s.id: s for s in HealthcareStaff.query.filter(HealthcareStaff.id.in_(s_ids)).all()} if s_ids else {}
+
         result = []
         for assignment in assignments:
-            patient = User.query.get(assignment.patient_id)
-            assigned_staff = HealthcareStaff.query.get(assignment.staff_id)
+            patient = patients_map.get(assignment.patient_id)
+            assigned_staff = staff_map.get(assignment.staff_id)
             
             assignment_dict = assignment.to_dict()
             assignment_dict['patient'] = patient.to_dict() if patient else None
@@ -57,6 +64,7 @@ def get_assignments():
 @jwt_required()
 def create_assignment():
     """Assign a patient to a nurse (super_admin only)"""
+    db.session.rollback()
     try:
         staff = verify_admin()
         if not staff:
@@ -119,6 +127,7 @@ def create_assignment():
 @jwt_required()
 def delete_assignment(assignment_id):
     """Remove an assignment (super_admin only)"""
+    db.session.rollback()
     try:
         staff = verify_admin()
         if not staff:
@@ -149,6 +158,7 @@ def delete_assignment(assignment_id):
 @jwt_required()
 def get_staff_list():
     """Get list of all staff (for dropdown)"""
+    db.session.rollback()
     try:
         staff = verify_admin()
         if not staff:

@@ -36,16 +36,36 @@ def get_patients():
             if not p_ids: return jsonify({'success': True, 'patients': []}), 200
             patients = User.query.filter(User.id.in_(p_ids)).all()
 
-        # 2. 獲取所有人的最新評估 (減少迴圈內壓力)
-        # 我們只取必要的欄位
+        p_ids = [p.id for p in patients]
+        
+        # 批量獲取 Watchlist 狀態
+        watch_list_records = PatientWatchlist.query.filter(
+            PatientWatchlist.staff_id == staff_id,
+            PatientWatchlist.patient_id.in_(p_ids)
+        ).all() if p_ids else []
+        watched_pids = {w.patient_id for w in watch_list_records}
+
+        # 批量獲取最新 AssessmentHistory (以每個 user_id 依據 completed_at 取第一筆)
+        # 用 dict 加快讀取。考慮效能，用一條 Query 做出來，也可以全都拉出來按時間排序取第一筆
+        # 我們直接取這批人的所有記錄，用 Python 去重：
+        histories = AssessmentHistory.query.filter(
+            AssessmentHistory.user_id.in_(p_ids),
+            AssessmentHistory.is_deleted == False
+        ).order_by(desc(AssessmentHistory.completed_at)).all() if p_ids else []
+        
+        latest_map = {}
+        for h in histories:
+            if h.user_id not in latest_map:
+                latest_map[h.user_id] = h
+
+        # 2. 獲取所有人的最新評估 (不在迴圈內部打 SQL)
         result = []
         today = datetime.now().date()
 
         for patient in patients:
             try:
-                # 這裡只抓最核心的資料
-                latest = AssessmentHistory.query.filter_by(user_id=patient.id, is_deleted=False)\
-                         .order_by(desc(AssessmentHistory.completed_at)).first()
+                # 這裡只抓最核心的資料，不再用 db 查詢
+                latest = latest_map.get(patient.id)
                 
                 # 計算未登入天數 (防禦性寫法)
                 last_login = patient.last_login_date
@@ -54,6 +74,9 @@ def get_patients():
                     if isinstance(last_login, str):
                         try: last_login = datetime.strptime(last_login[:10], '%Y-%m-%d').date()
                         except: last_login = None
+                    elif hasattr(last_login, 'date'):
+                        last_login = last_login.date()
+
                     if last_login and (today - last_login).days >= 5:
                         inactive = True
                 else: inactive = True
@@ -66,7 +89,7 @@ def get_patients():
                     'group': patient.group,
                     'inactive_warning': inactive,
                     'latest_assessment': latest.to_dict() if latest else None,
-                    'is_in_watchlist': PatientWatchlist.query.filter_by(staff_id=staff_id, patient_id=patient.id).first() is not None
+                    'is_in_watchlist': patient.id in watched_pids
                 }
                 result.append(p_data)
             except Exception as item_err:
