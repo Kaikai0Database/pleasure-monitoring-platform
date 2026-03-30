@@ -27,15 +27,15 @@ def create_app(config_name='default'):
         
         # 關鍵：這裡把請求中所有的 Header 都准許通行
         allow_headers = request.headers.get('Access-Control-Request-Headers')
-        if allow_headers:
-            response.headers['Access-Control-Allow-Headers'] = allow_headers
-        else:
-            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, ngrok-skip-browser-warning'
-            
-        response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE, OPTIONS'
+        base_headers = 'Content-Type, Authorization, ngrok-skip-browser-warning'
         
-        # 額外補上 ngrok 專用通行證
-        response.headers['ngrok-skip-browser-warning'] = 'true'
+        if allow_headers:
+            # 將前端請求的 Header 與我們預設必要的 Header 合併
+            response.headers['Access-Control-Allow-Headers'] = f"{allow_headers}, {base_headers}"
+        else:
+            response.headers['Access-Control-Allow-Headers'] = base_headers
+            
+        response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE, OPTIONS, PATCH'
         return response
     
     # --- 以下 Blueprint 註冊邏輯維持原樣 ---
