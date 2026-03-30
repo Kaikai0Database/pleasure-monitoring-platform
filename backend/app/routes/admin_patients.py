@@ -231,3 +231,58 @@ def get_patients_alert_counts():
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': f'獲獲取警告數量失敗: {str(e)}'}), 500
+
+
+@admin_patients_bp.route('/<int:patient_id>/history', methods=['GET'])
+@jwt_required()
+def get_patient_history(patient_id):
+    db.session.rollback()
+    try:
+        staff_id = verify_admin()
+        if not staff_id:
+            return jsonify({'success': False, 'message': '無效的管理員權限'}), 403
+        
+        patient = User.query.get(patient_id)
+        if not patient:
+            return jsonify({'success': False, 'message': '病人不存在'}), 404
+            
+        histories = AssessmentHistory.query.filter_by(
+            user_id=patient_id, is_deleted=False
+        ).order_by(desc(AssessmentHistory.completed_at)).all()
+        
+        return jsonify({
+            'success': True,
+            'history': [h.to_dict() for h in histories]
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'獲取歷史記錄失敗: {str(e)}'}), 500
+
+
+@admin_patients_bp.route('/<int:patient_id>/alerts', methods=['GET'])
+@jwt_required()
+def get_patient_alerts(patient_id):
+    db.session.rollback()
+    try:
+        staff_id = verify_admin()
+        if not staff_id:
+            return jsonify({'success': False, 'message': '無效的管理員權限'}), 403
+            
+        from app.models import ScoreAlert
+        
+        patient = User.query.get(patient_id)
+        if not patient:
+            return jsonify({'success': False, 'message': '病人不存在'}), 404
+            
+        alerts = ScoreAlert.query.filter_by(
+            user_id=patient_id
+        ).order_by(desc(ScoreAlert.created_at)).all()
+        
+        return jsonify({
+            'success': True,
+            'alerts': [a.to_dict() for a in alerts]
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'獲取警告記錄失敗: {str(e)}'}), 500
+
