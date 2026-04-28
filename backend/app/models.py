@@ -131,7 +131,7 @@ class AssessmentHistory(db.Model):
     max_score = db.Column(db.Integer, nullable=False)
     level = db.Column(db.String(50), nullable=False)
     answers = db.Column(db.Text, nullable=False)  # JSON string
-    completed_at = db.Column(db.DateTime, default=datetime.now)
+    completed_at = db.Column(db.DateTime)
     is_deleted = db.Column(db.Boolean, default=False)
     deleted_at = db.Column(db.DateTime, nullable=True)
     delete_reason = db.Column(db.String(255), nullable=True)
