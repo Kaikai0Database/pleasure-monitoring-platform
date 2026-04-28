@@ -5,8 +5,11 @@ from app.admin_models import PatientAssignment, PatientWatchlist, HealthcareStaf
 from sqlalchemy import desc
 from datetime import datetime, timedelta
 import json
+import pytz
 
 history_bp = Blueprint('history', __name__)
+taipei_tz = pytz.timezone('Asia/Taipei')
+now_taipei = datetime.now(taipei_tz).replace(tzinfo=None)
 
 @history_bp.route('', methods=['GET'])
 @jwt_required()
@@ -105,6 +108,7 @@ def save_history():
             max_score=data['max_score'],
             level=level,
             answers=json.dumps(data['answers'], ensure_ascii=False),
+            completed_at=now_taipei
         )
         
         db.session.add(new_history)
