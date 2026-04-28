@@ -105,7 +105,6 @@ def save_history():
             max_score=data['max_score'],
             level=level,
             answers=json.dumps(data['answers'], ensure_ascii=False),
-            completed_at=datetime.now()
         )
         
         db.session.add(new_history)
